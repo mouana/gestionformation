@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up() {
-        Schema::create('sessions', function (Blueprint $table) {
+        Schema::create('cours', function (Blueprint $table) {
             $table->id();
             $table->string('photo')->nullable();
             $table->date('dateDebut');
@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->time('heure_debut');
             $table->time('heure_fin');
             $table->enum('statut', ['planifiée', 'en cours', 'terminée', 'annulée'])->default('planifiée');
-            $table->foreignId('formateur_animateur_id')->constrained('compte_utilisateurs')->onDelete('cascade');
+            $table->foreignId('formateur_animateur_id')->constrained('utilisateurs')->onDelete('cascade');
             $table->timestamps();
         });
     }

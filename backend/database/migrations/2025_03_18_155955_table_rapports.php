@@ -10,8 +10,8 @@ return new class extends Migration {
             $table->text('contenu');
             $table->date('dateCreation');
             $table->tinyInteger('note')->nullable(); 
-            $table->foreignId('session_id')->constrained('sessions')->onDelete('cascade');
-            $table->foreignId('responsable_formation_id')->constrained('compte_utilisateurs')->onDelete('cascade');
+            $table->foreignId('cour_id')->constrained('cours')->onDelete('cascade');
+            $table->foreignId('responsable_formation_id')->constrained('utilisateurs')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nom');
             $table->string('email')->unique();
-            $table->string('motDePasse');
+            $table->string('motdePasse');
+            $table->string('matrecule');
+            $table->string('role');
             $table->timestamps();
         });
     }

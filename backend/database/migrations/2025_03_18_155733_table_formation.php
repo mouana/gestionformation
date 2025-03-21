@@ -10,8 +10,8 @@ return new class extends Migration {
             $table->string('titre');
             $table->text('description');
             $table->string('statut'); 
-            $table->foreignId('responsable_cdc_id')->constrained('compte_utilisateurs')->onDelete('cascade');
-            $table->foreignId('responsable_dr_id')->nullable()->constrained('compte_utilisateurs')->onDelete('set null');
+            $table->foreignId('responsable_cdc_id')->constrained('utilisateurs')->onDelete('cascade');
+            $table->foreignId('responsable_dr_id')->nullable()->constrained('utilisateurs')->onDelete('set null');
             $table->timestamp('date_validation')->nullable();
             $table->timestamps();
         });

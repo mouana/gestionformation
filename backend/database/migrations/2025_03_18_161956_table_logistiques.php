@@ -10,7 +10,7 @@ return new class extends Migration {
             $table->string('nom');
             $table->text('description')->nullable();
             $table->integer('quantite')->default(1);
-            $table->foreignId('session_id')->constrained('sessions')->onDelete('cascade'); 
+            $table->foreignId('cour_id')->constrained('cours')->onDelete('cascade'); 
             $table->timestamps();
         });
     }
