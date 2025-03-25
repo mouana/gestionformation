@@ -1,9 +1,17 @@
 import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import Login from '../Components/Auth/Login'
 
-function Routes() {
+function Routers() {
     return (
-        <></>
+        <>
+            <Router>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                </Routes>
+            </Router>
+        </>
     )
 }
 
-export default Routes
+export default Routers

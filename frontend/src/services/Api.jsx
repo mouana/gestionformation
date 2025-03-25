@@ -6,8 +6,7 @@ const Api = axios.create({
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
-    // withCredentials: true,
-    withCredentials: false,
+    withCredentials: true,
 })
 
 export default Api

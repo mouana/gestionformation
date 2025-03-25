@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 
 function Login() {
-    const [email, setEmail] = useState('esteban.schiller@gmail.com');
-    const [password, setPassword] = useState('');
-    const [rememberPassword, setRememberPassword] = useState(false);
+    const [email, setEmail] = useState('esteban.schiller@gmail.com')
+    const [password, setPassword] = useState('')
+    const [rememberPassword, setRememberPassword] = useState(false)
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-    };
+        e.preventDefault()
+    }
     return (
         <>
             <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">

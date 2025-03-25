@@ -1,10 +1,10 @@
 import { useState } from "react"
-import Login from "./Components/Auth/Login"
+import Routers from "./Routes/Routes"
 
 function App() {
     return (
         <>
-            <Login />
+            <Routers />
         </>
     )
 }
