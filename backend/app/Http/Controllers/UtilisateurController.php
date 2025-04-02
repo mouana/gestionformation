@@ -9,7 +9,7 @@ class UtilisateurController extends Controller
 {
     public function store(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'admin'|| auth()->user()->role !== 'responcable_drif'|| auth()->user()->role !== 'responcable_cdc'){
             return response()->json(['error' => 'Only admins can add users.'], 403);
         }
 

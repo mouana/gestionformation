@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AdminSystemAuthController extends Controller
+class RespoFormationAuthController extends Controller
 {
     public function login(Request $request)
     {
@@ -17,11 +17,11 @@ class AdminSystemAuthController extends Controller
         if (Auth::attempt(['matrecule' => $request->matrecule, 'password' => $request->motdePasse])) {
             $user = Auth::user();
 
-            if ($user->role !== 'admin') {
+            if ($user->role !== 'respancable_formation') {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
 
-            $token = $user->createToken('AdminToken')->accessToken;
+            $token = $user->createToken('responsable_formationToken')->accessToken;
             return response()->json(['token' => $token,'user'=>$user], 200);
         }
 
