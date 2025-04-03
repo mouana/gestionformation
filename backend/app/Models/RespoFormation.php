@@ -14,5 +14,6 @@ class RespoFormation extends Model
         'motdePasse',
         'matrecule',
         'role',
+        'utilisateur_id',
     ];
 }

@@ -13,5 +13,6 @@ class ResponsableDrif extends Model
         'motdePasse',
         'matrecule',
         'role',
+        'utilisateur_id',
     ];
 }

@@ -16,5 +16,6 @@ class ResponsableCdc extends Model
         'role',
         'filier', 
         'region', 
+        'utilisateur_id', 
     ];
 }

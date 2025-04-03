@@ -17,5 +17,6 @@ class FormteurParticipant extends Model
         'ISTA', 
         'region', 
         'ville', 
+        'utilisateur_id', 
     ];
 }
