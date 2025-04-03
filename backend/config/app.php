@@ -12,9 +12,8 @@ return [
     | other UI elements where an application name needs to be displayed.
     |
     */
-
     'name' => env('APP_NAME', 'Laravel'),
-
+    
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -40,7 +39,7 @@ return [
     */
 
     'debug' => (bool) env('APP_DEBUG', false),
-
+    
     /*
     |--------------------------------------------------------------------------
     | Application URL
@@ -51,9 +50,9 @@ return [
     | the application so that it's available within Artisan commands.
     |
     */
-
+    
     'url' => env('APP_URL', 'http://localhost'),
-
+    
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -66,7 +65,7 @@ return [
     */
 
     'timezone' => 'UTC',
-
+    
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
@@ -94,17 +93,17 @@ return [
     | are secure. You should do this prior to deploying the application.
     |
     */
-
+    
     'cipher' => 'AES-256-CBC',
-
+    
     'key' => env('APP_KEY'),
-
+    
     'previous_keys' => [
         ...array_filter(
             explode(',', env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
-
+    
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver
@@ -117,10 +116,12 @@ return [
     | Supported drivers: "file", "cache"
     |
     */
-
+    
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
+    
+   
+    
 ];

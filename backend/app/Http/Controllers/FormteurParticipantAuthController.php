@@ -17,7 +17,7 @@ class FormteurParticipantAuthController extends Controller
         if (Auth::attempt(['matrecule' => $request->matrecule, 'password' => $request->motdePasse])) {
             $user = Auth::user();
 
-            if ($user->role !== '') {
+            if ($user->role !== 'formateur_participant') {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
 

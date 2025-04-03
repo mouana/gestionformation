@@ -4,15 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FormateurAnimateur extends Model
+class ResponsableDrif extends Model
 {
-    protected $table ='formateurs_animateurs';
+    protected $table ='responsable_drif';
     protected $fillable = [
         'nom',
         'email',
         'motdePasse',
         'matrecule',
         'role',
-        'utilisateur_id',
     ];
 }
