@@ -42,4 +42,23 @@ class FormationController extends Controller
             'formation' => $formation
         ], 201);
     }
+    public function index()
+{
+    // Get the authenticated user
+    $user = Auth::user();
+
+    // Check if the user has permission to view formations
+    if (!$user || !in_array($user->role, ['responsable_cdc', 'responsable_drif', 'respancable_formation'])) {
+        return response()->json(['error' => 'Access denied. Only authorized personnel can view formations.'], 403);
+    }
+
+    // Retrieve all formations
+    $formations = Formation::all();
+
+    return response()->json([
+        'message' => 'Formations retrieved successfully',
+        'formations' => $formations
+    ], 200);
+}
+
 }

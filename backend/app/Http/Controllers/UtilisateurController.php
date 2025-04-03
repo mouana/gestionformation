@@ -8,6 +8,7 @@ use App\Models\ResponsableCdc;
 use App\Models\ResponsableDrif;
 use App\Models\FormateurAnimateur;
 use App\Models\FormteurParticipant;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,7 +36,6 @@ class UtilisateurController extends Controller
             return response()->json($validator->errors(), 400);
         }
     
-        // ✅ Étape 1 : Créer l'utilisateur et récupérer son ID
         $utilisateur = User::create([
             'nom' => $request->nom,
             'email' => $request->email,
@@ -44,20 +44,19 @@ class UtilisateurController extends Controller
             'role' => $request->role,
         ]);
     
-        $utilisateurId = $utilisateur->id; // ✅ Stocker l'ID utilisateur
+        $utilisateurId = $utilisateur->id; 
     
-        // ✅ Étape 2 : Ajouter les données spécifiques dans l'autre table
         switch ($request->role) {
             case 'responsable_cdc':
                 ResponsableCdc::create([
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId, 
                     'filiere' => $request->filiere,
                     'region' => $request->region,
                 ]);
                 break;
             case 'formateur_participant':
                 FormteurParticipant::create([
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId, 
                     'ISTA' => $request->ISTA,
                     'ville' => $request->ville,
                     'region' => $request->region,
@@ -65,17 +64,17 @@ class UtilisateurController extends Controller
                 break;
             case 'responsable_drif':
                 ResponsableDrif::create([
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId, 
                 ]);
                 break;
             case 'responsable_formation':
                 RespoFormation::create([
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId,
                 ]);
                 break;
             case 'formateur_animateur':
                 FormateurAnimateur::create([
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId, 
                 ]);
                 break;
         }
@@ -107,7 +106,6 @@ class UtilisateurController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        // Mise à jour de l'utilisateur principal
         $utilisateur->update([
             'nom' => $request->nom ?? $utilisateur->nom,
             'email' => $request->email ?? $utilisateur->email,
@@ -119,7 +117,6 @@ class UtilisateurController extends Controller
             $utilisateur->update(['motdePasse' => Hash::make($request->motdePasse)]);
         }
 
-        // Mise à jour des tables secondaires
         switch ($utilisateur->role) {
             case 'responsable_cdc':
                 ResponsableCdc::where('utilisateur_id', $utilisateur->id)->update([
@@ -156,16 +153,53 @@ class UtilisateurController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        // Suppression des entrées associées dans les autres tables
         ResponsableCdc::where('utilisateur_id', $user->id)->delete();
         FormteurParticipant::where('utilisateur_id', $user->id)->delete();
         ResponsableDrif::where('utilisateur_id', $user->id)->delete();
         RespoFormation::where('utilisateur_id', $user->id)->delete();
         FormateurAnimateur::where('utilisateur_id', $user->id)->delete();
 
-        // Suppression de l'utilisateur principal
         $user->delete();
 
         return response()->json(['message' => 'User deleted'], 200);
     }
+
+    public function index(Request $request)
+{
+    // Ensure only admins can access the user list
+    
+    $user = Auth::user();
+
+    // Retrieve users with optional pagination
+    if (!$user || !in_array($user->role, ['responsable_cdc', 'responsable_drif', 'respancable_formation'])) {
+        return response()->json(['error' => 'Access denied. Only authorized personnel can view formations.'], 403);
+    }
+    $users = User::paginate($request->get('per_page', 10));
+    // Attach role-specific data
+    $users->map(function ($user) {
+        switch ($user->role) {
+            case 'responsable_cdc':
+                $user->role_details = ResponsableCdc::where('utilisateur_id', $user->id)->first();
+                break;
+            case 'formateur_participant':
+                $user->role_details = FormteurParticipant::where('utilisateur_id', $user->id)->first();
+                break;
+            case 'responsable_drif':
+                $user->role_details = ResponsableDrif::where('utilisateur_id', $user->id)->first();
+                break;
+            case 'responsable_formation':
+                $user->role_details = RespoFormation::where('utilisateur_id', $user->id)->first();
+                break;
+            case 'formateur_animateur':
+                $user->role_details = FormateurAnimateur::where('utilisateur_id', $user->id)->first();
+                break;
+            default:
+                $user->role_details = null;
+        }
+        return $user;
+    });
+
+    return response()->json($users, 200);
+}
+
 }

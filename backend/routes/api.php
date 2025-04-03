@@ -15,4 +15,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/add-cour', [CourController::class, 'Store']);
     Route::post('/update-cour', [CourController::class, 'Update']);
     Route::post('/delete-cour', [CourController::class, 'Delete']);
+    Route::get('/users', [UtilisateurController::class, 'index']);
+    Route::get('/formation', [FormationController::class, 'index']);
 });
