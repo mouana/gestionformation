@@ -10,8 +10,6 @@ class Formation extends Model
         'titre',
         'description',
         'statut',
-        'responsable_cdc_id',
-        'responsable_dr_id',
         'date_validation',
     ];
 
