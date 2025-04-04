@@ -24,6 +24,9 @@ class Cour extends Model
     // public function Logistique(){
     //     return $this->belongsTo(Logistique::class);
     // }
+    public function Logistique(){
+        return $this->hasMany(Logistique::class);
+    }
 
      public function FormateurAnimateur(){
         return $this->hasOne(FormateurAnimateur::class);

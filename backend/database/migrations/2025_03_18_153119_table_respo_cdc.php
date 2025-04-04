@@ -8,6 +8,7 @@ return new class extends Migration {
         Schema::create('responsable_cdc', function (Blueprint $table) {
             $table->id();
             $table->string('filiere');
+
             $table->string('region');
             $table->enum('role', ['responsable_cdc'])->default('responsable_cdc');
             $table->foreignId('utilisateur_id')->constrained('utilisateurs')->onDelete('cascade');

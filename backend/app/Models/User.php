@@ -26,4 +26,10 @@ class User extends Authenticatable
     {
         return $this->role === 'admin'; 
     }
+
+    public function ResponsableDrif(){
+
+        return $this->hasMany(ResponsableDrif::class);
+
+    }
 }

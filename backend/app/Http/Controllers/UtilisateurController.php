@@ -44,19 +44,21 @@ class UtilisateurController extends Controller
             'role' => $request->role,
         ]);
     
-        $utilisateurId = $utilisateur->id; 
+        $utilisateurId = $utilisateur->id; // ✅ Stocker l'ID utilisateur
     
+        // ✅ Étape 2 : Ajouter les données spécifiques dans l'autre table
         switch ($request->role) {
             case 'responsable_cdc':
                 ResponsableCdc::create([
-                    'utilisateur_id' => $utilisateurId, 
+                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
                     'filiere' => $request->filiere,
                     'region' => $request->region,
                 ]);
                 break;
             case 'formateur_participant':
                 FormteurParticipant::create([
-                    'utilisateur_id' => $utilisateurId, 
+
+                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
                     'ISTA' => $request->ISTA,
                     'ville' => $request->ville,
                     'region' => $request->region,
@@ -65,16 +67,18 @@ class UtilisateurController extends Controller
             case 'responsable_drif':
                 ResponsableDrif::create([
                     'utilisateur_id' => $utilisateurId, 
+
                 ]);
                 break;
             case 'responsable_formation':
                 RespoFormation::create([
                     'utilisateur_id' => $utilisateurId,
+
                 ]);
-                break;
             case 'formateur_animateur':
                 FormateurAnimateur::create([
-                    'utilisateur_id' => $utilisateurId, 
+
+                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
                 ]);
                 break;
         }
@@ -106,6 +110,8 @@ class UtilisateurController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
+
+        // Mise à jour de l'utilisateur principal
         $utilisateur->update([
             'nom' => $request->nom ?? $utilisateur->nom,
             'email' => $request->email ?? $utilisateur->email,
@@ -117,6 +123,8 @@ class UtilisateurController extends Controller
             $utilisateur->update(['motdePasse' => Hash::make($request->motdePasse)]);
         }
 
+
+        // Mise à jour des tables secondaires
         switch ($utilisateur->role) {
             case 'responsable_cdc':
                 ResponsableCdc::where('utilisateur_id', $utilisateur->id)->update([
@@ -153,12 +161,15 @@ class UtilisateurController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
+
+        // Suppression des entrées associées dans les autres tables
         ResponsableCdc::where('utilisateur_id', $user->id)->delete();
         FormteurParticipant::where('utilisateur_id', $user->id)->delete();
         ResponsableDrif::where('utilisateur_id', $user->id)->delete();
         RespoFormation::where('utilisateur_id', $user->id)->delete();
         FormateurAnimateur::where('utilisateur_id', $user->id)->delete();
 
+        // Suppression de l'utilisateur principal
         $user->delete();
 
         return response()->json(['message' => 'User deleted'], 200);
