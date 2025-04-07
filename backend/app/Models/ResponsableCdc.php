@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FormateurAnimateur extends Model
+class ResponsableCdc extends Model
 {
-    protected $table = 'formateurs_animateurs';
+    protected $table = 'responsable_cdc';
 
     protected $fillable = [
+        'filiere',
+        'region',
         'role',
         'utilisateur_id',
     ];
