@@ -7,6 +7,7 @@ use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\AdminSystemAuthController;
 use App\Http\Controllers\LogistiqueController;
 use App\Http\Controllers\ResponsableDrifController;
+use App\Http\Controllers\RapportController;
 
 Route::post('/login', [BaseAuthController::class, 'login']);
 
@@ -19,7 +20,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/delete-cour', [CourController::class, 'Delete']);
     Route::get('/users', [UtilisateurController::class, 'index']);
     Route::get('/formation', [FormationController::class, 'index']);
+
+    // Rapport routes
+    Route::apiResource('rapports', RapportController::class);
+    Route::get('rapports/course/{courseId}', [RapportController::class, 'getByCourse']);
+    Route::get('rapports/responsable/{responsableId}', [RapportController::class, 'getByResponsable']);
 });
+    
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/add-logistique', [LogistiqueController::class, 'store']);

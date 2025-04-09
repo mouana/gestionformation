@@ -10,12 +10,27 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
     protected $table = 'utilisateurs';
 
-    protected $fillable = ['nom', 'email', 'motdePasse', 'matrecule', 'role'];
+    protected $fillable = [
+        'nom',
+        'prenom',
+        'email',
+        'motdePasse',
+        'matrecule',
+        'role'
+    ];
 
-    protected $hidden = ['motdePasse'];
+    protected $hidden = [
+        'motdePasse',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'motdePasse' => 'hashed',
+    ];
 
     public function getAuthPassword()
     {
