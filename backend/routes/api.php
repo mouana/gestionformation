@@ -8,9 +8,13 @@ use App\Http\Controllers\AdminSystemAuthController;
 
 use App\Http\Controllers\LogistiqueController;
 use App\Http\Controllers\ResponsableDrifController;
+<<<<<<< HEAD
 use App\Http\Controllers\FormateurAnimateurController;
 use App\Http\Controllers\ResponsableCdcController;
 
+=======
+use App\Http\Controllers\RapportController;
+>>>>>>> a434633b3bbc225ad1fb1b5d3568db7055767c85
 
 Route::post('/login', [BaseAuthController::class, 'login']);
 
@@ -23,7 +27,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/delete-cour', [CourController::class, 'Delete']);
     Route::get('/users', [UtilisateurController::class, 'index']);
     Route::get('/formation', [FormationController::class, 'index']);
+
+    // Rapport routes
+    Route::apiResource('rapports', RapportController::class);
+    Route::get('rapports/course/{courseId}', [RapportController::class, 'getByCourse']);
+    Route::get('rapports/responsable/{responsableId}', [RapportController::class, 'getByResponsable']);
 });
+    
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/add-logistique', [LogistiqueController::class, 'store']);
