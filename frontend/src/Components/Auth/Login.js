@@ -21,13 +21,12 @@ function Login() {
         const token = localStorage.getItem("auth_token");
         const role = localStorage.getItem("role");
 
-        // Only dispatch loginUserSuccess if user is not already authenticated
         if (token && role && !user) { 
             dispatch(loginUserSuccess({ token, role }));
         }
 
         if (user) {
-            navigate("/formationlist"); 
+            navigate("/dashboard"); 
         }
     }, [user, navigate, dispatch]);
 
