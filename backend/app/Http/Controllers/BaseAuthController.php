@@ -19,7 +19,6 @@ class BaseAuthController extends Controller
             new FormteurParticipantAuthController(),
 
             new DrifAuthController(),
-            // Add more controllers if needed
         ];
     }
 
