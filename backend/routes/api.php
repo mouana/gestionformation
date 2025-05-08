@@ -5,8 +5,12 @@ use App\Http\Controllers\BaseAuthController;
 use App\Http\Controllers\FormationController;
 use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\AdminSystemAuthController;
+
 use App\Http\Controllers\LogistiqueController;
 use App\Http\Controllers\ResponsableDrifController;
+use App\Http\Controllers\FormateurAnimateurController;
+use App\Http\Controllers\ResponsableCdcController;
+
 
 Route::post('/login', [BaseAuthController::class, 'login']);
 
@@ -36,3 +40,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('drif/formations/{id}/reject', [ResponsableDrifController::class, 'reject']);
     Route::delete('drif/formations/{id}', [ResponsableDrifController::class, 'destroy']);
 });
+
+// Formateur Animateur :
+Route::apiResource('formateurs-animateurs', FormateurAnimateurController::class);
+
+// Responsable CDC :
+Route::resource('responsable-cdc', ResponsableCdcController::class);
