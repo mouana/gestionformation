@@ -11,19 +11,17 @@ class FormationController extends Controller
 {
     public function store(Request $request)
     {
-        // Get the authenticated user
         $user = Auth::user();
 
-        // Check if the user has one of the allowed roles
         if (!$user || !in_array($user->role, ['responsable_cdc', 'responsable_drif', 'respancable_formation'])) {
             return response()->json(['error' => 'Access denied. Only authorized personnel can add a formation.'], 403);
         }
 
-        // Validate the request data
         $validator = Validator::make($request->all(), [
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
             'statut' => 'required|string|min:6',
+            'animateur_id' => 'required|integer|exists:formateurs_animateurs,id',
         ]);
 
         if ($validator->fails()) {
@@ -35,6 +33,7 @@ class FormationController extends Controller
             'titre' => $request->titre,
             'description' => $request->description,
             'statut' => $request->statut,
+            'animateur_id' => $request->animateur_id
         ]);
 
         return response()->json([
@@ -52,8 +51,7 @@ class FormationController extends Controller
         return response()->json(['error' => 'Access denied. Only authorized personnel can view formations.'], 403);
     }
 
-    // Retrieve all formations
-    $formations = Formation::all();
+    $formations = Formation::with('animateur.utilisateur')->get();
 
     return response()->json([
         'message' => 'Formations retrieved successfully',

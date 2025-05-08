@@ -10,7 +10,7 @@ class FormateurAnimateurController extends Controller
 {
     public function index()
     {
-        $formateursAnimateurs = FormateurAnimateur::all();
+        $formateursAnimateurs = FormateurAnimateur::with('utilisateur')->get();
         return response()->json($formateursAnimateurs);
     }
 

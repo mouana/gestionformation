@@ -44,13 +44,12 @@ class UtilisateurController extends Controller
             'role' => $request->role,
         ]);
     
-        $utilisateurId = $utilisateur->id; // ✅ Stocker l'ID utilisateur
+        $utilisateurId = $utilisateur->id; 
     
-        // ✅ Étape 2 : Ajouter les données spécifiques dans l'autre table
         switch ($request->role) {
             case 'responsable_cdc':
                 ResponsableCdc::create([
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId, 
                     'filiere' => $request->filiere,
                     'region' => $request->region,
                 ]);
@@ -58,7 +57,7 @@ class UtilisateurController extends Controller
             case 'formateur_participant':
                 FormteurParticipant::create([
 
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId, 
                     'ISTA' => $request->ISTA,
                     'ville' => $request->ville,
                     'region' => $request->region,
@@ -78,7 +77,7 @@ class UtilisateurController extends Controller
             case 'formateur_animateur':
                 FormateurAnimateur::create([
 
-                    'utilisateur_id' => $utilisateurId, // ✅ Passer l'ID utilisateur
+                    'utilisateur_id' => $utilisateurId, // 
                 ]);
                 break;
         }

@@ -17,8 +17,13 @@ class FormateurAnimateur extends Model
     ];
     public function utilisateur()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'utilisateur_id');
     }
+    public function Formation()
+    {
+        return $this->belongsTo(Formation::class);
+    }
+    
 }
 
 

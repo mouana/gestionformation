@@ -19,4 +19,9 @@ class FormteurParticipant extends Model
         'ville', 
         'utilisateur_id', 
     ];
+
+    public function utilisateur()
+    {
+        return $this->belongsTo(User::class,'utilisateur_id');
+    }
 }

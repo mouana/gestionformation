@@ -1,20 +1,16 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CourController;
+use App\Http\Controllers\RapportController;
 use App\Http\Controllers\BaseAuthController;
 use App\Http\Controllers\FormationController;
-use App\Http\Controllers\UtilisateurController;
-use App\Http\Controllers\AdminSystemAuthController;
-
 use App\Http\Controllers\LogistiqueController;
-use App\Http\Controllers\ResponsableDrifController;
-<<<<<<< HEAD
-use App\Http\Controllers\FormateurAnimateurController;
+use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\ResponsableCdcController;
-
-=======
-use App\Http\Controllers\RapportController;
->>>>>>> a434633b3bbc225ad1fb1b5d3568db7055767c85
+use App\Http\Controllers\AdminSystemAuthController;
+use App\Http\Controllers\ResponsableDrifController;
+use App\Http\Controllers\FormateurAnimateurController;
+use App\Http\Controllers\FormteurParticipantController;
 
 Route::post('/login', [BaseAuthController::class, 'login']);
 
@@ -26,14 +22,20 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/update-cour', [CourController::class, 'Update']);
     Route::post('/delete-cour', [CourController::class, 'Delete']);
     Route::get('/users', [UtilisateurController::class, 'index']);
-    Route::get('/formation', [FormationController::class, 'index']);
-
+    
     // Rapport routes
     Route::apiResource('rapports', RapportController::class);
     Route::get('rapports/course/{courseId}', [RapportController::class, 'getByCourse']);
     Route::get('rapports/responsable/{responsableId}', [RapportController::class, 'getByResponsable']);
+
+    Route::apiResource('formateurs-animateurs', FormateurAnimateurController::class);
+Route::get('/participant', [FormteurParticipantController::class, 'index']);
+
+// Responsable CDC :
+Route::resource('responsable-cdc', ResponsableCdcController::class);
+Route::get('/formation', [FormationController::class, 'index']);
 });
-    
+
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/add-logistique', [LogistiqueController::class, 'store']);
@@ -52,7 +54,3 @@ Route::middleware(['auth:api'])->group(function () {
 });
 
 // Formateur Animateur :
-Route::apiResource('formateurs-animateurs', FormateurAnimateurController::class);
-
-// Responsable CDC :
-Route::resource('responsable-cdc', ResponsableCdcController::class);

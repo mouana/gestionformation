@@ -12,6 +12,7 @@ class Formation extends Model
         'titre',
         'description',
         'statut',
+        'animateur_id',
         'date_validation',
     ];
 
@@ -30,6 +31,9 @@ class Formation extends Model
     public function ResponsableDrif(){
 
         return $this->belongsTo(ResponsableDrif::class);
+    }
+    public function Animateur(){
 
+        return $this->belongsTo(FormateurAnimateur::class,'animateur_id');
     }
 }
