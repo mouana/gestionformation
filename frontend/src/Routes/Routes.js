@@ -9,6 +9,9 @@ import FormationsPage from '../Components/Dashboard/Formations_dashboard';
 import AddFormationForm from '../Components/Dashboard/AddFormationForm';
 import AnimateursDashboard from '../Components/Dashboard/AnimateurDashboard';
 import ParticipantDashboard from '../Components/Dashboard/ParticipantDashboard';
+import AddParticipantForm from '../Components/Dashboard/AddParticipantsForm';
+import AddFormateurAnimateur from '../Components/Dashboard/AddFormateurAnimateur';
+// import FilteredFormations from '../Components/Dashboard/FilteredFormations';
 import Layout from '../Components/Dashboard/layout'
 
 function Routers() {
@@ -24,6 +27,9 @@ function Routers() {
                     <Route path="ajouterformation" element={<AddFormationForm />} />
                     <Route path="animateurs" element={<AnimateursDashboard />} />
                     <Route path="formateurs" element={<ParticipantDashboard />} />
+                    <Route path="ajouterparticipant" element={<AddParticipantForm />} />
+                    <Route path="ajouteranimateur" element={<AddFormateurAnimateur />} />
+                    {/* <Route path="filteredformation" element={<FilteredFormations />} /> */}
                 </Route>
             </Routes>
         </Router>

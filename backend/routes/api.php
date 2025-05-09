@@ -16,7 +16,10 @@ Route::post('/login', [BaseAuthController::class, 'login']);
 
 Route::middleware('auth:api')->post('/admin/logout', [AdminSystemAuthController::class, 'logout']);
 Route::middleware(['auth:api'])->group(function () {
-    Route::post('/admin/add-utilisateur', [UtilisateurController::class, 'store']);
+    Route::post('/admin/utilisateur', [UtilisateurController::class, 'store']);
+    Route::put('/users/{id}', [UtilisateurController::class, 'update']);
+    Route::delete('/users/{id}', [UtilisateurController::class, 'delete']);
+    // Route::post('/admin/utilisateur', [UtilisateurController::class, 'store']);
     Route::post('/add-formation', [FormationController::class, 'store']);
     Route::post('/add-cour', [CourController::class, 'Store']);
     Route::post('/update-cour', [CourController::class, 'Update']);
@@ -34,6 +37,9 @@ Route::get('/participant', [FormteurParticipantController::class, 'index']);
 // Responsable CDC :
 Route::resource('responsable-cdc', ResponsableCdcController::class);
 Route::get('/formation', [FormationController::class, 'index']);
+Route::put('/formation/{id}', [FormationController::class, 'update']);
+    Route::delete('/formation/{id}', [FormationController::class, 'destroy']);
+    Route::post('/formation', [FormationController::class, 'store']); 
 });
 
 
@@ -52,5 +58,3 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('drif/formations/{id}/reject', [ResponsableDrifController::class, 'reject']);
     Route::delete('drif/formations/{id}', [ResponsableDrifController::class, 'destroy']);
 });
-
-// Formateur Animateur :

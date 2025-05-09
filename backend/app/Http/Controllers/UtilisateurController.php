@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\RespoFormation;
 use App\Models\ResponsableCdc;
 use App\Models\ResponsableDrif;
+use Illuminate\Validation\Rule;
 use App\Models\FormateurAnimateur;
 use App\Models\FormteurParticipant;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +17,10 @@ class UtilisateurController extends Controller
 {
     public function store(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
-            return response()->json(['error' => 'Only admins can add users.'], 403);
-        }
+        // if (!in_array(auth()->user()->role, ['admin', 'responsable_cdc', 'responsable_drif'])) {
+        //     return response()->json(['error' => 'Only authorized users can add users.'], 403);
+        // }
+        
     
         $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
@@ -28,7 +30,7 @@ class UtilisateurController extends Controller
             'role' => 'required|in:responsable_cdc,responsable_drif,responsable_formation,formateur_animateur,formateur_participant,admin',
             'filiere' => 'string|nullable',
             'region' => 'string|nullable',
-            'ISTA' => 'integer|nullable',
+            'ISTA' => 'string|nullable',
             'ville' => 'string|nullable',
         ]);
     
@@ -88,91 +90,100 @@ class UtilisateurController extends Controller
 
 
     public function update(Request $request, User $utilisateur)
-    {
-        if (auth()->user()->role !== 'admin' && auth()->user()->id !== $utilisateur->id) {
-            return response()->json(['error' => 'Unauthorized to update this user.'], 403);
-        }
+{
+    // Retrieve all data from request
+    $data = $request->all();
 
-        $validator = Validator::make($request->all(), [
-            'nom' => 'string|max:255',
-            'email' => 'string|email|unique:utilisateurs,email,' . $utilisateur->id,
-            'motdePasse' => 'nullable|string|min:6',
-            'matrecule' => 'string|unique:utilisateurs,matrecule,' . $utilisateur->id,
-            'role' => 'in:responsable_cdc,responsable_drif,responsable_formation,formateur_animateur,formateur_participant,admin',
-            'filiere' => 'nullable|string',
-            'region' => 'nullable|string',
-            'ISTA' => 'nullable|integer',
-            'ville' => 'nullable|string',
-        ]);
+    // Validation rules
+    $validator = Validator::make($data, [
+        'nom' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'email',
+            Rule::unique('utilisateurs')->ignore($utilisateur->id), // ou ->ignore($utilisateur->utilisateur_id, 'utilisateur_id')
+        ],
+        'motdePasse' => 'nullable|string|min:6',
+        'matrecule' => [
+            'required',
+            Rule::unique('utilisateurs')->ignore($utilisateur->id), // ou ->ignore($utilisateur->utilisateur_id, 'utilisateur_id')
+        ],
+        'role' => 'required|in:responsable_cdc,responsable_drif,responsable_formation,formateur_animateur,formateur_participant,admin',
+        'filiere' => 'nullable|string',
+        'region' => 'nullable|string',
+        'ISTA' => 'nullable|string',
+        'ville' => 'nullable|string',
+    ]);
+    
+    
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
-
-        // Mise à jour de l'utilisateur principal
-        $utilisateur->update([
-            'nom' => $request->nom ?? $utilisateur->nom,
-            'email' => $request->email ?? $utilisateur->email,
-            'matrecule' => $request->matrecule ?? $utilisateur->matrecule,
-            'role' => $request->role ?? $utilisateur->role,
-        ]);
-
-        if ($request->filled('motdePasse')) {
-            $utilisateur->update(['motdePasse' => Hash::make($request->motdePasse)]);
-        }
-
-
-        // Mise à jour des tables secondaires
-        switch ($utilisateur->role) {
-            case 'responsable_cdc':
-                ResponsableCdc::where('utilisateur_id', $utilisateur->id)->update([
-                    'filiere' => $request->filiere,
-                    'region' => $request->region,
-                ]);
-                break;
-            case 'formateur_participant':
-                FormteurParticipant::where('utilisateur_id', $utilisateur->id)->update([
-                    'ISTA' => $request->ISTA,
-                    'ville' => $request->ville,
-                    'region' => $request->region,
-                ]);
-                break;
-            case 'responsable_drif':
-                ResponsableDrif::where('utilisateur_id', $utilisateur->id)->update([]);
-                break;
-            case 'responsable_formation':
-                RespoFormation::where('utilisateur_id', $utilisateur->id)->update([]);
-                break;
-            case 'formateur_animateur':
-                FormateurAnimateur::where('utilisateur_id', $utilisateur->id)->update([]);
-                break;
-        }
-
-        return response()->json(['message' => 'User updated successfully', 'utilisateur' => $utilisateur]);
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
     }
 
-    public function delete(User $utilisateur)
-    {
-        $user = User::find($utilisateur->id);
+    // Update the user's main fields
+    $utilisateur->fill([
+        'nom' => $data['nom'] ?? $utilisateur->nom,
+        'email' => $data['email'] ?? $utilisateur->email,
+        'matrecule' => $data['matrecule'] ?? $utilisateur->matrecule,
+        'role' => $data['role'] ?? $utilisateur->role,
+    ]);
 
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-
-        // Suppression des entrées associées dans les autres tables
-        ResponsableCdc::where('utilisateur_id', $user->id)->delete();
-        FormteurParticipant::where('utilisateur_id', $user->id)->delete();
-        ResponsableDrif::where('utilisateur_id', $user->id)->delete();
-        RespoFormation::where('utilisateur_id', $user->id)->delete();
-        FormateurAnimateur::where('utilisateur_id', $user->id)->delete();
-
-        // Suppression de l'utilisateur principal
-        $user->delete();
-
-        return response()->json(['message' => 'User deleted'], 200);
+    // Hash password if provided
+    if (!empty($data['motdePasse'])) {
+        $utilisateur->motdePasse = Hash::make($data['motdePasse']);
     }
+
+    // Save the user
+    $utilisateur->save();
+
+    // Update the role-specific tables based on the user's role
+    match ($utilisateur->role) {
+        'responsable_cdc' => ResponsableCdc::updateOrCreate(
+            ['utilisateur_id' => $utilisateur->id],
+            ['filiere' => $data['filiere'] ?? null, 'region' => $data['region'] ?? null]
+        ),
+        'formateur_participant' => FormteurParticipant::updateOrCreate(
+            ['utilisateur_id' => $utilisateur->id],
+            ['ISTA' => $data['ISTA'] ?? null, 'ville' => $data['ville'] ?? null, 'region' => $data['region'] ?? null]
+        ),
+        'responsable_drif' => ResponsableDrif::updateOrCreate(['utilisateur_id' => $utilisateur->id], []),
+        'responsable_formation' => RespoFormation::updateOrCreate(['utilisateur_id' => $utilisateur->id], []),
+        'formateur_animateur' => FormateurAnimateur::updateOrCreate(['utilisateur_id' => $utilisateur->id], []),
+        default => null,
+    };
+
+    return response()->json(['message' => 'Utilisateur mis à jour avec succès', 'utilisateur' => $utilisateur]);
+}
+
+
+
+
+public function delete($id)
+{
+    $user = User::find($id);
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $relatedModels = [
+        ResponsableCdc::class,
+        FormteurParticipant::class,
+        ResponsableDrif::class,
+        RespoFormation::class,
+        FormateurAnimateur::class,
+    ];
+
+    foreach ($relatedModels as $model) {
+        $model::where('utilisateur_id', $user->id)->delete();
+    }
+
+    $user->delete();
+
+    return response()->json(['message' => 'User deleted'], 200);
+}
+
+
 
     public function index(Request $request)
 {

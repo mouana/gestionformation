@@ -18,11 +18,16 @@ function Login() {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("auth_token");
+        const token = localStorage.getItem("token");
         const role = localStorage.getItem("role");
+        const userData = localStorage.getItem("user");
 
-        if (token && role && !user) { 
-            dispatch(loginUserSuccess({ token, role }));
+        if (token && role && userData && !user) {
+            dispatch(loginUserSuccess({
+                token,
+                role,
+                user: JSON.parse(userData)
+            }));
         }
 
         if (user) {

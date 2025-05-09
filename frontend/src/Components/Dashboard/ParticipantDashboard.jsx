@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaFilter, FaUserPlus } from 'react-icons/fa';
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
-
+import {Link} from 'react-router-dom'
 const ParticipantDashboard = () => {
   const [data, setData] = useState([]);
   const token = localStorage.getItem("token"); 
-
   useEffect(() => {
     axios.get('http://127.0.0.1:8000/api/participant',{
       headers: {
@@ -35,10 +34,10 @@ const ParticipantDashboard = () => {
     <div className="flex min-h-screen">
       <main className="flex-1 bg-gray-100 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Animateurs</h1>
-          <button className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
-            <FaUserPlus /> Add Animateurs
-          </button>
+          <h1 className="text-2xl font-semibold">Participants</h1>
+          <Link to={'/ajouterparticipant'}><button className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
+            <FaUserPlus /> Ajouter Participants
+          </button></Link>
         </div>
 
         <div className="flex flex-wrap items-center gap-4 mb-4">

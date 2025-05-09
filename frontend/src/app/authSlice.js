@@ -13,13 +13,16 @@ const authSlice = createSlice({
     reducers: {
         loginUserStart(state) {
             state.loading = true;
+            state.error = null;
         },
         loginUserSuccess(state, action) {
-            state.user = action.payload; 
+            const { token, role, user } = action.payload;
+            state.user = user;
             state.loading = false;
 
-            localStorage.setItem("auth_token", action.payload.token);
-            localStorage.setItem("role", action.payload.role);
+            localStorage.setItem("token", token);
+            localStorage.setItem("role", role);
+            localStorage.setItem("user", JSON.stringify(user));
         },
         loginUserFailure(state, action) {
             state.error = action.payload;
@@ -27,23 +30,28 @@ const authSlice = createSlice({
         },
         logoutUser(state) {
             state.user = null;
-
-            localStorage.removeItem("auth_token");
+            localStorage.removeItem("token");
             localStorage.removeItem("role");
+            localStorage.removeItem("user");
         }
     }
 });
 
-export const { loginUserStart, loginUserSuccess, loginUserFailure, logoutUser } = authSlice.actions;
+export const {
+    loginUserStart,
+    loginUserSuccess,
+    loginUserFailure,
+    logoutUser
+} = authSlice.actions;
+
 export default authSlice.reducer;
 
 export const loginUser = (credentials) => async (dispatch) => {
     dispatch(loginUserStart());
     try {
         const response = await axios.post("http://127.0.0.1:8000/api/login", credentials);
-
-        const { token, role } = response.data;  
-        dispatch(loginUserSuccess({ token, role }));
+        const { token, role, user } = response.data;
+        dispatch(loginUserSuccess({ token, role, user }));
     } catch (error) {
         let errorMessage = "Login failed. Please check your credentials.";
         if (error.response) {
@@ -55,7 +63,4 @@ export const loginUser = (credentials) => async (dispatch) => {
         }
         dispatch(loginUserFailure(errorMessage));
     }
-
-
-    
 };
