@@ -15,7 +15,7 @@ class ResponsableCdc extends Model
         'motdePasse',
         'matrecule',
         'role',
-        'filier', 
+        'filiere', 
         'region', 
         'utilisateur_id', 
     ];

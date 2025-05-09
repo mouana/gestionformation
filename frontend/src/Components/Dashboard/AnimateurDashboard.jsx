@@ -55,40 +55,40 @@ const AnimateursDashboard = () => {
     });
   };
 
-  const handleUpdate = (utilisateur_id) => {
-    if (!utilisateur_id) return alert("ID de l'utilisateur manquant");
-  
-    setIsUpdating(true);
-  
-    axios.put(`http://127.0.0.1:8000/api/users/${utilisateur_id}`, editForm, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+ const handleUpdate = (utilisateur_id) => {
+  if (!utilisateur_id) return alert("ID de l'utilisateur manquant");
+
+  setIsUpdating(true);
+
+  axios.put(`http://127.0.0.1:8000/api/users/${utilisateur_id}`, editForm, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+    .then((response) => {
+      const updatedUser = response.data.utilisateur;
+
+      setData(prev =>
+        prev.map(item =>
+          item.utilisateur_id === utilisateur_id ? { ...item, ...updatedUser } : item
+        )
+      );
+
+      setEditId(null);
     })
-      .then((response) => {
-        const updatedUser = response.data.utilisateur;
-  
-        setData(prev =>
-          prev.map(item =>
-            item.utilisateur_id === utilisateur_id ? { ...item, ...updatedUser } : item
-          )
-        );
-  
-        setEditId(null);
-      })
-      .catch(error => {
-        const msg = error.response?.data?.errors
-          ? JSON.stringify(error.response.data.errors, null, 2)
-          : "Erreur lors de la mise à jour.";
-  
-        alert(msg);
-        console.error("Erreur update :", error);
-        console.log("Détails de l'erreur :", error.response?.data);
-      })
-      .finally(() => setIsUpdating(false));
-  };
-  
+    .catch(error => {
+      const msg = error.response?.data?.errors
+        ? JSON.stringify(error.response.data.errors, null, 2)
+        : "Erreur lors de la mise à jour.";
+
+      alert(msg);
+      console.error("Erreur update :", error);
+      console.log("Détails de l'erreur :", error.response?.data);
+    })
+    .finally(() => setIsUpdating(false));
+};
+
   
 
   const handleDelete = (utilisateur_id) => {

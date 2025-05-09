@@ -2,87 +2,97 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaFilter, FaUserPlus } from 'react-icons/fa';
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom';
 
-
-const ParticipantDashboard = () => {
+const CdcDashboard = () => {
   const [data, setData] = useState([]);
   const token = localStorage.getItem("token"); 
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/participant',{
+    axios.get('http://127.0.0.1:8000/api/responsable-cdc', {
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
       .then(response => {
-        const formattedData = response.data.map(item => ({
-          id: item.utilisateur.matrecule,
-          first: item.utilisateur.nom,
-          email: item.utilisateur.email,
-          region: item.region,
-          ville:item.ville,
-          ISTA:item.ISTA,
-          role:item.role,
-          filiere: 'DEV' 
-        }));
-        setData(formattedData);
+        setData(response.data);
       })
       .catch(error => {
-        console.error('Error fetching animateurs:', error);
+        console.error('Error fetching CDC responsables:', error);
       });
   }, []);
+
+  const handleDelete = (id) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce responsable CDC?')) {
+      axios.delete(`http://127.0.0.1:8000/api/responsable-cdc/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then(() => {
+          setData(data.filter(item => item.id !== id));
+        })
+        .catch(error => {
+          console.error('Error deleting CDC responsable:', error);
+        });
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
       <main className="flex-1 bg-gray-100 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Participants</h1>
-          <Link to={'/ajouterparticipant'}><button className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
-            <FaUserPlus /> Ajouter Participants
-          </button></Link>
+          <h1 className="text-2xl font-semibold">Responsables CDC</h1>
+          <Link to="/add-cdc" className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
+            <FaUserPlus /> Ajouter Responsable CDC
+          </Link>
         </div>
+
         <div className="flex flex-wrap items-center gap-4 mb-4">
           <div className="flex items-center border px-4 py-2 rounded bg-white gap-2">
-            <FaFilter /> <span>Filter By</span>
+            <FaFilter /> <span>Filtrer Par</span>
           </div>
           <select className="px-4 py-2 rounded border bg-white">
-            <option>Name</option>
+            <option>Nom</option>
           </select>
           <select className="px-4 py-2 rounded border bg-white">
             <option>Email</option>
           </select>
           <select className="px-4 py-2 rounded border bg-white">
-            <option>ISTA</option>
+            <option>Région</option>
           </select>
-          <button className="text-red-500 font-medium">Reset Filter</button>
+          <button className="text-red-500 font-medium">Réinitialiser Filtre</button>
         </div>
 
         <div className="overflow-auto bg-white rounded shadow">
           <table className="min-w-full table-auto">
             <thead className="bg-gray-100">
               <tr className="text-left text-sm text-gray-600">
-                <th className="px-6 py-3">Matrecule</th>
-                <th className="px-6 py-3">Nom Complet</th>
-                <th className="px-6 py-3">EMAIL</th>
-                <th className="px-6 py-3">REGION</th>
-                <th className="px-6 py-3">VILLE</th>
-                <th className="px-6 py-3">ISTA</th>
-                <th className="px-6 py-3">FILIERE</th>
-                <th className="px-6 py-3">ROLE</th>
+                <th className="px-6 py-3">ID</th>
+                <th className="px-6 py-3">Filière</th>
+                <th className="px-6 py-3">Région</th>
+                <th className="px-6 py-3">Rôle</th>
+                <th className="px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
               {data.map((item, index) => (
                 <tr key={index} className="border-t hover:bg-gray-50 text-sm">
                   <td className="px-6 py-4">{item.id}</td>
-                  <td className="px-6 py-4">{item.first}</td>
-                  <td className="px-6 py-4">{item.email}</td>
-                  <td className="px-6 py-4">{item.region}</td>
-                  <td className="px-6 py-4">{item.ville}</td>
-                  <td className="px-6 py-4">{item.ISTA}</td>
                   <td className="px-6 py-4">{item.filiere}</td>
+                  <td className="px-6 py-4">{item.region}</td>
                   <td className="px-6 py-4">{item.role}</td>
+                  <td className="px-6 py-4 flex gap-2">
+                    <Link to={`/update-cdc/${item.id}`} className="text-blue-500 hover:text-blue-700">
+                      Modifier
+                    </Link>
+                    <button 
+                      onClick={() => handleDelete(item.id)} 
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Supprimer
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -93,11 +103,9 @@ const ParticipantDashboard = () => {
           <button className="p-2 bg-white rounded border"><IoIosArrowBack /></button>
           <button className="p-2 bg-white rounded border"><IoIosArrowForward /></button>
         </div>
-    </main>
+      </main>
     </div>
-    
   );
 };
 
-export default ParticipantDashboard;
-
+export default CdcDashboard;
