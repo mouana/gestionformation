@@ -33,7 +33,7 @@ const AddCdcForm = () => {
 
     try {
       // First create the user
-      const userResponse = await axios.post('http://127.0.0.1:8000/api/admin/add-utilisateur', {
+      const userResponse = await axios.post('http://127.0.0.1:8000/api/admin/utilisateur', {
         nom: formData.nom,
         prenom: formData.prenom,
         email: formData.email,

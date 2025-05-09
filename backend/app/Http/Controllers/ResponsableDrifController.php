@@ -2,78 +2,116 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\Formation;
-
+use App\Models\ResponsableDrif;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ResponsableDrifController extends Controller
 {
+    public function index()
+    {
+        $responsables = ResponsableDrif::with('utilisateur')->get();
+        return response()->json($responsables);
+    }
 
+    public function show($id)
+    {
+        $responsable = ResponsableDrif::with('utilisateur')->findOrFail($id);
+        return response()->json($responsable);
+    }
 
     public function store(Request $request)
     {
-       
-        $request->validate([
-            'titre' => 'required|string|max:255',
-            'description' => 'required|string',
-            'responsable_cdc_id' => 'required|exists:utilisateurs,id',
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            'nom' => 'required|string|max:255',
+            'email' => 'required|email|unique:utilisateurs,email',
+            'matrecule' => 'required|string|unique:utilisateurs,matrecule',
+            'role' => 'required|in:responsable_drif',
+            'region' => 'nullable|string',
+            'ISTA' => 'nullable|string',
+            'ville' => 'nullable|string',
+            'motdePasse' => 'required|string|min:6',
         ]);
 
-     
-        $formation = Formation::create([
-            'titre' => $request->titre,
-            'description' => $request->description,
-            'statut' => 'en attente', 
-            'responsable_cdc_id' => $request->responsable_cdc_id,
-            'responsable_dr_id' => auth()->id(), 
-            'date_validation' => now(),
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Créer l'utilisateur lié
+        $utilisateur = User::create([
+            'nom' => $data['nom'],
+            'email' => $data['email'],
+            'matrecule' => $data['matrecule'],
+            'motdePasse' => bcrypt($data['motdePasse']),
+            'role' => 'responsable_drif',
         ]);
 
-       
+        // Créer le responsable
+        $responsable = ResponsableDrif::create([
+            'utilisateur_id' => $utilisateur->id,
+        ]);
+
         return response()->json([
-            'message' => 'Formation ajoutée avec succès',
-            'formation' => $formation
+            'message' => 'Responsable créé avec succès',
+            'responsable' => $responsable->load('utilisateur')
         ], 201);
     }
 
-  
-    public function reject($id)
+    public function update(Request $request, $id)
     {
+        // Ici, $id est l'ID du user (utilisateurs.id)
+        $utilisateur = User::findOrFail($id);
+        
+        // On récupère le responsable lié à ce user
+        $responsable = ResponsableDrif::where('utilisateur_id', $id)->firstOrFail();
     
-        $formation = Formation::find($id);
-
-        
-        if (!$formation) {
-            return response()->json(['message' => 'Formation non trouvée'], 404);
+        $data = $request->all();
+    
+        $validator = Validator::make($data, [
+            'nom' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('utilisateurs', 'email')->ignore($utilisateur->id),
+            ],
+            'matrecule' => [
+                'required',
+                Rule::unique('utilisateurs', 'matrecule')->ignore($utilisateur->id),
+            ],
+            'motdePasse' => 'nullable|string|min:6',
+            'role' => 'required|in:responsable_drif',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
-
-       
-        $formation->statut = 'rejetée';
-        $formation->date_validation = now();
-        $formation->save();
-
-        
+    
+        $utilisateur->update([
+            'nom' => $data['nom'],
+            'email' => $data['email'],
+            'matrecule' => $data['matrecule'],
+            'role' => $data['role'],
+            'motdePasse' => !empty($data['motdePasse']) ? bcrypt($data['motdePasse']) : $utilisateur->motdePasse,
+        ]);
+    
         return response()->json([
-            'message' => 'Formation rejetée avec succès',
-            'formation' => $formation
-        ], 200);
+            'message' => 'Utilisateur mis à jour avec succès',
+            'utilisateur' => $utilisateur
+        ]);
     }
-
 
     public function destroy($id)
     {
-       
-        $formation = Formation::find($id);
+        $responsable = ResponsableDrif::findOrFail($id);
+        $utilisateur = $responsable->utilisateur;
 
-       
-        if (!$formation) {
-            return response()->json(['message' => 'Formation non trouvée'], 404);
-        }
+        $responsable->delete();
+        $utilisateur->delete();
 
-        $formation->delete();
-
-    
-        return response()->json(['message' => 'Formation supprimée avec succès'], 200);
+        return response()->json(['message' => 'Responsable supprimé avec succès.']);
     }
 }

@@ -17,9 +17,6 @@ class UtilisateurController extends Controller
 {
     public function store(Request $request)
     {
-        // if (!in_array(auth()->user()->role, ['admin', 'responsable_cdc', 'responsable_drif'])) {
-        //     return response()->json(['error' => 'Only authorized users can add users.'], 403);
-        // }
         
     
         $validator = Validator::make($request->all(), [

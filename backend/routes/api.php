@@ -32,6 +32,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('rapports/responsable/{responsableId}', [RapportController::class, 'getByResponsable']);
 
     Route::apiResource('formateurs-animateurs', FormateurAnimateurController::class);
+    Route::put('Animateur/{id}', [FormateurAnimateurController::class, 'update']);
+
 Route::get('/participant', [FormteurParticipantController::class, 'index']);
 
 // Responsable CDC :
@@ -54,7 +56,7 @@ Route::get('/get-logistiques', [LogistiqueController::class, 'index']);
 Route::get('/get-logistique/{id}', [LogistiqueController::class, 'show']);
 
 Route::middleware(['auth:api'])->group(function () {
-    Route::post('drif/formations', [ResponsableDrifController::class, 'store']);
-    Route::put('drif/formations/{id}/reject', [ResponsableDrifController::class, 'reject']);
-    Route::delete('drif/formations/{id}', [ResponsableDrifController::class, 'destroy']);
+    Route::get('drif', [ResponsableDrifController::class, 'index']);
+    Route::put('drif/{id}', [ResponsableDrifController::class, 'update']);
+    Route::delete('drif/{id}', [ResponsableDrifController::class, 'destroy']);
 });

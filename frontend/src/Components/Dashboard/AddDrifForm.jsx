@@ -9,12 +9,14 @@ const AddDrifForm = () => {
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     nom: '',
-    prenom: '',
     email: '',
-    password: '',
-    telephone: '',
-    region: '',
+    motdePasse: '',
+    matrecule: '',
     role: 'responsable_drif',
+    region: '',
+    filiere: '',
+    ISTA: '',
+    ville: ''
   });
 
   const handleChange = (e) => {
@@ -31,33 +33,21 @@ const AddDrifForm = () => {
     setError('');
 
     try {
-      // First create the user
-      const userResponse = await axios.post('http://127.0.0.1:8000/api/admin/add-utilisateur', {
+      // Create the user
+      const userResponse = await axios.post('http://127.0.0.1:8000/api/admin/utilisateur', {
         nom: formData.nom,
-        prenom: formData.prenom,
         email: formData.email,
-        password: formData.password,
-        telephone: formData.telephone,
+        motdePasse: formData.motdePasse,
+        matrecule: formData.matrecule,
         role: formData.role
       }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-
-      // Then create the DRIF responsable with the user ID
-      await axios.post('http://127.0.0.1:8000/api/responsable-drif', {
-        region: formData.region,
-        role: formData.role,
-        utilisateur_id: userResponse.data.id
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      // Redirect to DRIF dashboard on success
       navigate('/drif');
+
+
     } catch (err) {
       console.error('Error adding DRIF responsable:', err);
       setError(err.response?.data?.message || 'Une erreur est survenue lors de l\'ajout du responsable DRIF');
@@ -92,17 +82,6 @@ const AddDrifForm = () => {
                 />
               </div>
               <div>
-                <label className="block text-gray-700 mb-2">Prénom</label>
-                <input
-                  type="text"
-                  name="prenom"
-                  value={formData.prenom}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                  required
-                />
-              </div>
-              <div>
                 <label className="block text-gray-700 mb-2">Email</label>
                 <input
                   type="email"
@@ -117,19 +96,19 @@ const AddDrifForm = () => {
                 <label className="block text-gray-700 mb-2">Mot de passe</label>
                 <input
                   type="password"
-                  name="password"
-                  value={formData.password}
+                  name="motdePasse"
+                  value={formData.motdePasse}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-700 mb-2">Téléphone</label>
+                <label className="block text-gray-700 mb-2">Matrecule</label>
                 <input
                   type="text"
-                  name="telephone"
-                  value={formData.telephone}
+                  name="matrecule"
+                  value={formData.matrecule}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded px-3 py-2"
                   required
@@ -146,6 +125,43 @@ const AddDrifForm = () => {
                   required
                 />
               </div>
+              {/* Optional fields based on role */}
+              {formData.role === 'responsable_cdc' && (
+                <div>
+                  <label className="block text-gray-700 mb-2">Filière</label>
+                  <input
+                    type="text"
+                    name="filiere"
+                    value={formData.filiere}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2"
+                  />
+                </div>
+              )}
+              {formData.role === 'formateur_participant' && (
+                <>
+                  <div>
+                    <label className="block text-gray-700 mb-2">ISTA</label>
+                    <input
+                      type="text"
+                      name="ISTA"
+                      value={formData.ISTA}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2">Ville</label>
+                    <input
+                      type="text"
+                      name="ville"
+                      value={formData.ville}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex justify-end gap-4">

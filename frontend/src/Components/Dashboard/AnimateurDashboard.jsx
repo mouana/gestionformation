@@ -6,17 +6,9 @@ import { Link } from 'react-router-dom';
 
 const AnimateursDashboard = () => {
   const [data, setData] = useState([]);
-  const [editId, setEditId] = useState(null);
-  const [utilisateur, setUtilisateur] = useState(null);
-  const [editForm, setEditForm] = useState({
-    nom: '',
-    email: '',
-    role: ''
-  });
-
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [editingId, setEditingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -30,72 +22,39 @@ const AnimateursDashboard = () => {
       .then(response => {
         const formattedData = response.data.map(item => ({
           id: item.utilisateur.matrecule,
+          matrecule: item.utilisateur.matrecule,
           nom: item.utilisateur.nom,
           email: item.utilisateur.email,
           role: item.utilisateur.role,
           utilisateur_id: item.utilisateur_id,
         }));
-
         setData(formattedData);
-        setUtilisateur(utilisateur)
-        
-        console.log(utilisateur)
       })
       .catch(error => {
         console.error('Erreur lors du chargement des animateurs :', error);
       });
   };
 
-  const handleEdit = (item) => {
-    setEditId(item.id);
+  const handleEditClick = (item) => {
+    setEditingId(item.utilisateur_id);
     setEditForm({
       nom: item.nom,
       email: item.email,
-      role: item.role
+      matrecule: item.matrecule,
+      role: item.role,
+      motdePasse: "",
     });
   };
 
- const handleUpdate = (utilisateur_id) => {
-  if (!utilisateur_id) return alert("ID de l'utilisateur manquant");
-
-  setIsUpdating(true);
-
-  axios.put(`http://127.0.0.1:8000/api/users/${utilisateur_id}`, editForm, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-    .then((response) => {
-      const updatedUser = response.data.utilisateur;
-
-      setData(prev =>
-        prev.map(item =>
-          item.utilisateur_id === utilisateur_id ? { ...item, ...updatedUser } : item
-        )
-      );
-
-      setEditId(null);
-    })
-    .catch(error => {
-      const msg = error.response?.data?.errors
-        ? JSON.stringify(error.response.data.errors, null, 2)
-        : "Erreur lors de la mise à jour.";
-
-      alert(msg);
-      console.error("Erreur update :", error);
-      console.log("Détails de l'erreur :", error.response?.data);
-    })
-    .finally(() => setIsUpdating(false));
-};
-
-  
+  const handleChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
 
   const handleDelete = (utilisateur_id) => {
     if (!window.confirm("Voulez-vous vraiment supprimer cet animateur ?")) return;
-  
+
     setDeletingId(utilisateur_id);
-  
+
     axios.delete(`http://127.0.0.1:8000/api/users/${utilisateur_id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -109,9 +68,25 @@ const AnimateursDashboard = () => {
       .finally(() => setDeletingId(null));
   };
 
-  
-  
-  
+  const handleUpdate = (utilisateur_id) => {
+    axios.put(`http://127.0.0.1:8000/api/Animateur/${utilisateur_id}`, editForm, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        setData(prev =>
+          prev.map(item =>
+            item.utilisateur_id === utilisateur_id
+              ? { ...item, ...editForm }
+              : item
+          )
+        );
+        setEditingId(null);
+      })
+      .catch(error => {
+        alert("Erreur lors de la mise à jour.");
+        console.error("Mise à jour erreur :", error.response || error);
+      });
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -120,7 +95,7 @@ const AnimateursDashboard = () => {
           <h1 className="text-2xl font-semibold">Animateurs</h1>
           <Link to={'/ajouteranimateur'}>
             <button className="bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
-              <FaUserPlus /> Ajouter Animateurs
+              <FaUserPlus /> Ajouter Animateur
             </button>
           </Link>
         </div>
@@ -129,15 +104,9 @@ const AnimateursDashboard = () => {
           <div className="flex items-center border px-4 py-2 rounded bg-white gap-2">
             <FaFilter /> <span>Filter By</span>
           </div>
-          <select className="px-4 py-2 rounded border bg-white">
-            <option>Nom</option>
-          </select>
-          <select className="px-4 py-2 rounded border bg-white">
-            <option>Email</option>
-          </select>
-          <select className="px-4 py-2 rounded border bg-white">
-            <option>Rôle</option>
-          </select>
+          <select className="px-4 py-2 rounded border bg-white"><option>Nom</option></select>
+          <select className="px-4 py-2 rounded border bg-white"><option>Email</option></select>
+          <select className="px-4 py-2 rounded border bg-white"><option>Rôle</option></select>
           <button className="text-red-500 font-medium">Reset Filter</button>
         </div>
 
@@ -149,71 +118,108 @@ const AnimateursDashboard = () => {
                 <th className="px-6 py-3">Nom</th>
                 <th className="px-6 py-3">Email</th>
                 <th className="px-6 py-3">Rôle</th>
+                <th className="px-6 py-3">Mot de passe</th>
                 <th className="px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((item, index) => (
-                <tr key={index} className="border-t hover:bg-gray-50 text-sm">
-                  <td className="px-6 py-4">{item.id}</td>
+              {data.map(item => (
+                <tr key={item.utilisateur_id} className="border-t hover:bg-gray-50 text-sm">
                   <td className="px-6 py-4">
-                    {editId === item.id ? (
+                    {editingId === item.utilisateur_id ? (
                       <input
-                        type="text"
+                        name="matrecule"
+                        value={editForm.matrecule}
+                        onChange={handleChange}
+                        className="border p-1"
+                      />
+                    ) : (
+                      item.matrecule
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {editingId === item.utilisateur_id ? (
+                      <input
+                        name="nom"
                         value={editForm.nom}
-                        onChange={(e) => setEditForm({ ...editForm, nom: e.target.value })}
-                        className="border rounded px-2 py-1 w-full"
+                        onChange={handleChange}
+                        className="border p-1"
                       />
                     ) : (
                       item.nom
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    {editId === item.id ? (
+                    {editingId === item.utilisateur_id ? (
                       <input
-                        type="email"
+                        name="email"
                         value={editForm.email}
-                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                        className="border rounded px-2 py-1 w-full"
+                        onChange={handleChange}
+                        className="border p-1"
                       />
                     ) : (
                       item.email
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    {editId === item.id ? (
-                      <input
-                        type="text"
+                    {editingId === item.utilisateur_id ? (
+                      <select
+                        name="role"
                         value={editForm.role}
-                        onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                        className="border rounded px-2 py-1 w-full"
-                      />
+                        onChange={handleChange}
+                        className="border p-1"
+                      >
+                        <option value="formateur_animateur">Animateur</option>
+                      </select>
                     ) : (
                       item.role
                     )}
                   </td>
+                  <td className="px-6 py-4">
+                    {editingId === item.utilisateur_id ? (
+                      <input
+                        type="password"
+                        name="motdePasse"
+                        value={editForm.motdePasse}
+                        onChange={handleChange}
+                        className="border p-1"
+                        placeholder="Laisser vide pour ne pas changer"
+                      />
+                    ) : (
+                      "••••••"
+                    )}
+                  </td>
                   <td className="px-6 py-4 flex gap-2">
-                    {editId === item.id ? (
+                    {editingId === item.utilisateur_id ? (
                       <>
                         <button
-                          onClick={handleUpdate}
-                          disabled={isUpdating}
-                          className={`text-green-600 hover:underline ${isUpdating ? 'opacity-50' : ''}`}
+                          onClick={() => handleUpdate(item.utilisateur_id)}
+                          className="text-green-600 hover:underline"
                         >
-                          {isUpdating ? '...' : 'Enregistrer'}
+                          Enregistrer
                         </button>
-                        <button onClick={() => setEditId(null)} className="text-gray-600 hover:underline">Annuler</button>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="text-gray-500 hover:underline"
+                        >
+                          Annuler
+                        </button>
                       </>
                     ) : (
                       <>
-                        <button onClick={() => handleEdit(item)} className="text-blue-600 hover:underline">Modifier</button>
                         <button
-  onClick={() => handleDelete(item.utilisateur_id)}
-  disabled={deletingId === item.utilisateur_id}
-  className={`text-red-600 hover:underline ${deletingId === item.utilisateur_id ? 'opacity-50' : ''}`}
->
-  {deletingId === item.utilisateur_id ? '...' : 'Supprimer'}
-</button>
+                          onClick={() => handleEditClick(item)}
+                          className="text-blue-500 hover:text-blue-700"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.utilisateur_id)}
+                          disabled={deletingId === item.utilisateur_id}
+                          className={`text-red-600 hover:underline ${deletingId === item.utilisateur_id ? 'opacity-50' : ''}`}
+                        >
+                          {deletingId === item.utilisateur_id ? '...' : 'Supprimer'}
+                        </button>
                       </>
                     )}
                   </td>

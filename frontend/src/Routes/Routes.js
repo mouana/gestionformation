@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from '../Components/Auth/Login';
-import FormationForm from '../Components/formation/FormationForm';
-import CourForm from '../Components/formation/CourForm';
-import FormationList from '../Components/formation/FormationList';
+// import FormationForm from '../Components/formation/FormationForm';
+// import CourForm from '../Components/formation/CourForm';
+// import FormationList from '../Components/formation/FormationList';
 import Dashboard from '../Components/Dashboard/dashboard';
 import FormationsPage from '../Components/Dashboard/Formations_dashboard';
 import AddFormationForm from '../Components/Dashboard/AddFormationForm';

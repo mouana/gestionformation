@@ -9,8 +9,8 @@ function Login() {
     const [remembermotdePasse, setRemembermotdePasse] = useState(false);
 
     const dispatch = useDispatch();
-    const navigate = useNavigate(); 
-    const { loading, error, user } = useSelector((state) => state.auth); 
+    const navigate = useNavigate();
+    const { loading, error, user } = useSelector((state) => state.auth);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -22,16 +22,18 @@ function Login() {
         const role = localStorage.getItem("role");
         const userData = localStorage.getItem("user");
 
-        if (token && role && userData && !user) {
-            dispatch(loginUserSuccess({
-                token,
-                role,
-                user: JSON.parse(userData)
-            }));
+        // Parse only if userData is not undefined or null
+        if (token && role && userData && userData !== "undefined" && !user) {
+            try {
+                const parsedUser = JSON.parse(userData);
+                dispatch(loginUserSuccess({ token, role, user: parsedUser }));
+            } catch (e) {
+                console.error("Failed to parse userData from localStorage", e);
+            }
         }
 
         if (user) {
-            navigate("/dashboard"); 
+            navigate("/dashboard");
         }
     }, [user, navigate, dispatch]);
 
@@ -45,8 +47,8 @@ function Login() {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label htmlFor="matrecule" className="block text-gray-700 mb-2">Matricule</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             id="matrecule"
                             value={matrecule}
                             onChange={(e) => setMatrecule(e.target.value)}
@@ -59,8 +61,8 @@ function Login() {
                             <label htmlFor="motdePasse" className="block text-gray-700">Password</label>
                             <a href="#" className="text-sm text-[#285793] hover:underline">Forget Password?</a>
                         </div>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             id="motdePasse"
                             value={motdePasse}
                             onChange={(e) => setMotdePasse(e.target.value)}
@@ -69,8 +71,8 @@ function Login() {
                     </div>
 
                     <div className="mb-6 flex items-center">
-                        <input 
-                            type="checkbox" 
+                        <input
+                            type="checkbox"
                             id="remember"
                             checked={remembermotdePasse}
                             onChange={(e) => setRemembermotdePasse(e.target.checked)}
@@ -79,8 +81,8 @@ function Login() {
                         <label htmlFor="remember" className="text-gray-700">Remember Password</label>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="w-full bg-[#285793] text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
                         disabled={loading}
                     >
