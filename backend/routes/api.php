@@ -34,14 +34,17 @@ Route::middleware(['auth:api'])->group(function () {
     Route::apiResource('formateurs-animateurs', FormateurAnimateurController::class);
     Route::put('Animateur/{id}', [FormateurAnimateurController::class, 'update']);
 
-Route::get('/participant', [FormteurParticipantController::class, 'index']);
-
-// Responsable CDC :
-Route::resource('responsable-cdc', ResponsableCdcController::class);
-Route::get('/formation', [FormationController::class, 'index']);
-Route::put('/formation/{id}', [FormationController::class, 'update']);
+    
+    // Responsable CDC :
+    // Route::resource('responsable-cdc', ResponsableCdcController::class);
+    Route::put('/cdc/{id}', [ResponsableCdcController::class, 'update']);
+    Route::get('/cdc', [ResponsableCdcController::class, 'index']);
     Route::delete('/formation/{id}', [FormationController::class, 'destroy']);
     Route::post('/formation', [FormationController::class, 'store']); 
+    Route::get('/formation', [FormationController::class, 'index']);
+    Route::put('/formation/{id}', [FormationController::class, 'update']);
+    Route::get('/participant', [FormteurParticipantController::class, 'index']);
+Route::put('/participant/{id}', [FormteurParticipantController::class, 'update']);
 });
 
 

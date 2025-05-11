@@ -46,10 +46,9 @@ class FormationController extends Controller
     // Get the authenticated user
     $user = Auth::user();
 
-    // Check if the user has permission to view formations
-    if (!$user || !in_array($user->role, ['responsable_cdc', 'responsable_drif', 'respancable_formation'])) {
-        return response()->json(['error' => 'Access denied. Only authorized personnel can view formations.'], 403);
-    }
+    // if (!$user || !in_array($user->role, ['responsable_cdc', 'responsable_drif', 'respancable_formation'])) {
+    //     return response()->json(['error' => 'Access denied. Only authorized personnel can view formations.'], 403);
+    // }
 
     $formations = Formation::with('animateur.utilisateur')->get();
 

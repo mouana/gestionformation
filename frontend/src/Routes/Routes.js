@@ -15,9 +15,9 @@ import AddFormateurAnimateur from '../Components/Dashboard/AddFormateurAnimateur
 import CdcDashboard from '../Components/Dashboard/CdcDashboard';
 import DrifDashboard from '../Components/Dashboard/DrifDashboard';
 import AddCdcForm from '../Components/Dashboard/AddCdcForm';
-import UpdateCdcForm from '../Components/Dashboard/UpdateCdcForm';
+// import UpdateCdcForm from '../Components/Dashboard/UpdateCdcForm';
 import AddDrifForm from '../Components/Dashboard/AddDrifForm';
-import UpdateDrifForm from '../Components/Dashboard/UpdateDrifForm';
+// import UpdateDrifForm from '../Components/Dashboard/UpdateDrifForm';
 import Layout from '../Components/Dashboard/layout'
 
 function Routers() {
@@ -37,11 +37,11 @@ function Routers() {
                     <Route path="ajouteranimateur" element={<AddFormateurAnimateur />} />
                     {/* <Route path="filteredformation" element={<FilteredFormations />} /> */}
                     <Route path="cdc" element={<CdcDashboard />} />
-                    <Route path="add-cdc" element={<AddCdcForm />} />
-                    <Route path="update-cdc/:id" element={<UpdateCdcForm />} />
+                    <Route path="ajoutercdc" element={<AddCdcForm />} />
+                    {/* <Route path="update-cdc/:id" element={<UpdateCdcForm />} /> */}
                     <Route path="drif" element={<DrifDashboard />} />
                     <Route path="add-drif" element={<AddDrifForm />} />
-                    <Route path="update-drif/:id" element={<UpdateDrifForm />} />
+                    {/* <Route path="update-drif/:id" element={<UpdateDrifForm />} /> */}
                 </Route>
             </Routes>
         </Router>
