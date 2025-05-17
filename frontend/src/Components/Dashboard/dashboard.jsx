@@ -1,119 +1,139 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  Tooltip,
-} from 'chart.js';
-import {
-  FaUserTie,
-  FaUsers,
-  FaChartLine,
-  FaClock,
-  FaCog,
-  FaPowerOff,
-} from 'react-icons/fa';
-import { MdDashboard, MdEmail, MdCalendarToday } from 'react-icons/md';
+import React, { useEffect, useState } from 'react';
+import { FiUsers, FiBook, FiAward, FiHome, FiDownload } from 'react-icons/fi';
+import { FaChalkboardTeacher, FaUserTie } from 'react-icons/fa';
+import { BsGraphUp } from 'react-icons/bs';
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip);
+const Dashboard = () => {
+  const [stats, setStats] = useState({
+    total_formations: 0,
+    total_animateurs: 0,
+    total_cdc: 0,
+    total_drif: 0,
+    formations: []
+  });
+  const [loading, setLoading] = useState(true);
+    const token = localStorage.getItem("token");
 
-export default function Dashboard() {
-  const [menuOpen, setMenuOpen] = useState(false);
 
-  const data = {
-    labels: Array.from({ length: 60 }, (_, i) => `${(i + 1) * 1000}`),
-    datasets: [
-      {
-        label: 'Sales %',
-        data: Array.from({ length: 60 }, () => Math.random() * 100),
-        borderColor: '#3b82f6',
-        fill: true,
-        pointRadius: 4,
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/admin/dashboard'
+          , {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    const data = await response.json();
+    console.log(data)
+        setStats(data);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      y: { beginAtZero: true, ticks: { callback: (val) => `${val}%` } },
-    },
-  };
+    fetchData();
+  }, []);
 
-  const cards = [
-    { label: 'Total Formateurs', value: '40,689', icon: <FaUserTie />, trend: '+8.5% Up from yesterday', color: 'text-green-500' },
-    { label: 'Total Animateurs', value: '10,293', icon: <FaUsers />, trend: '+1.3% Up from past week', color: 'text-green-400' },
-    { label: 'Total Formations', value: '$89,000', icon: <FaChartLine />, trend: '-4.3% Down from yesterday', color: 'text-red-500' },
-    { label: 'Total CDC', value: '2040', icon: <FaClock />, trend: '+1.8% Up from yesterday', color: 'text-green-500' },
-  ];
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
-  
+    <div className="min-h-screen bg-gray-50 p-6">
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
+      
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard 
+          icon={<FiBook className="text-blue-500 text-2xl" />} 
+          title="Total Formations" 
+          value={stats.total_formations} 
+          color="bg-blue-100" 
+        />
+        <StatCard 
+          icon={<FaChalkboardTeacher className="text-green-500 text-2xl" />} 
+          title="Total Animateurs" 
+          value={stats.total_animateurs} 
+          color="bg-green-100" 
+        />
+        <StatCard 
+          icon={<FaUserTie className="text-purple-500 text-2xl" />} 
+          title="Total CDC" 
+          value={stats.total_cdc} 
+          color="bg-purple-100" 
+        />
+        <StatCard 
+          icon={<FiHome className="text-orange-500 text-2xl" />} 
+          title="Total DRIF" 
+          value={stats.total_drif} 
+          color="bg-orange-100" 
+        />
+      </div>
 
-      <main className="flex-1 p-6">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm">English</span>
-            <img src="https://flagcdn.com/gb.svg" alt="EN" className="w-6 h-4" />
-            <img
-              src="https://randomuser.me/api/portraits/women/65.jpg"
-              alt="Profile"
-              className="w-8 h-8 rounded-full"
-            />
-          </div>
+      {/* Formations Table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">Formations Overview</h2>
         </div>
-
-        {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {cards.map((card, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl shadow-md p-4 flex items-center justify-between"
-            >
-              <div>
-                <div className="text-sm text-gray-500">{card.label}</div>
-                <div className="text-xl font-semibold">{card.value}</div>
-                <div className={`text-xs mt-1 ${card.color}`}>{card.trend}</div>
-              </div>
-              <div className="text-2xl text-gray-400">{card.icon}</div>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Formation</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Animateur</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Courses</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {stats.formations.map((formation) => (
+                <tr key={formation.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{formation.titre}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{formation.animateur}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {formation.course_count} courses
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      formation.status === 'terminée' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {formation.status
+}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        {/* Chart */}
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <div className="flex justify-between mb-2">
-            <h2 className="text-lg font-semibold">Sales Details</h2>
-            <select className="border rounded px-2 py-1 text-sm">
-              <option>October</option>
-            </select>
-          </div>
-          <div className="h-64">
-            <Line data={data} options={options} />
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
-}
+};
 
-function SidebarItem({ icon, label, active = false }) {
-  return (
-    <div
-      className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium cursor-pointer hover:bg-blue-100 transition-colors ${
-        active ? 'bg-blue-100 text-blue-700' : 'text-gray-700'
-      }`}
-    >
-      {icon && <div className="mr-2 text-lg">{icon}</div>}
-      {label}
+const StatCard = ({ icon, title, value, color }) => (
+  <div className={`${color} p-6 rounded-lg shadow`}>
+    <div className="flex items-center">
+      <div className="p-3 rounded-full bg-white mr-4">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-600">{title}</p>
+        <p className="text-2xl font-semibold text-gray-900">{value}</p>
+      </div>
     </div>
-  );
-}
+  </div>
+);
+
+export default Dashboard;

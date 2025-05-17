@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\ResponsableDrif;
+use App\Models\FormteurParticipant;
 use Illuminate\Database\Eloquent\Model;
 
 class Formation extends Model
@@ -26,6 +27,12 @@ class Formation extends Model
     public function Cour(){
         return $this->hasMany(Cour::class);
     }
+public function participants()
+{
+    return $this->belongsToMany(FormteurParticipant::class, 'formateur_participant_formation', 
+              'formation_id', 'formateur_participant_id')
+              ->withTimestamps();
+}
 
 
     public function ResponsableDrif(){

@@ -306,24 +306,27 @@ const AnimateursDashboard = () => {
                             </button>
                           </div>
                         ) : (
-                          <div className="flex justify-end space-x-2">
-                            <button
-                              onClick={() => handleEditClick(item)}
-                              className="text-blue-600 hover:text-blue-900 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
-                            >
-                              <FaEdit />
-
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item.utilisateur_id)}
-                              disabled={deletingId === item.utilisateur_id}
-                              className={`text-red-600 hover:text-red-900 px-2 py-1 rounded hover:bg-red-50 transition-colors ${deletingId === item.utilisateur_id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                              {deletingId === item.utilisateur_id ? 'Suppression...' : ''}
-                                                    <FaTrash />
-
-                            </button>
-                          </div>
+                         <div className="flex justify-end space-x-3">
+  <button
+    onClick={() => handleEditClick(item)}
+    className="text-blue-600 hover:text-blue-900 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors min-w-[3.5rem] flex items-center justify-center"
+  >
+    <FaEdit className="text-lg" />
+  </button>
+  <button
+    onClick={() => handleDelete(item.utilisateur_id)}
+    disabled={deletingId === item.utilisateur_id}
+    className={`text-red-600 hover:text-red-900 px-4 py-2 rounded-md hover:bg-red-50 transition-colors min-w-[3.5rem] flex items-center justify-center ${
+      deletingId === item.utilisateur_id ? 'opacity-50 cursor-not-allowed' : ''
+    }`}
+  >
+    {deletingId === item.utilisateur_id ? (
+      <span className="text-sm">Suppression...</span>
+    ) : (
+      <FaTrash className="text-lg" />
+    )}
+  </button>
+</div>
                         )}
                       </td>
                     </tr>

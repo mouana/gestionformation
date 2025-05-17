@@ -1,9 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Login from '../Components/Auth/Login';
-// import FormationForm from '../Components/formation/FormationForm';
-// import CourForm from '../Components/formation/CourForm';
-// import FormationList from '../Components/formation/FormationList';
 import Dashboard from '../Components/Dashboard/dashboard';
 import FormationsPage from '../Components/Dashboard/Formations_dashboard';
 import AddFormationForm from '../Components/Dashboard/AddFormationForm';
@@ -11,37 +9,75 @@ import AnimateursDashboard from '../Components/Dashboard/AnimateurDashboard';
 import ParticipantDashboard from '../Components/Dashboard/ParticipantDashboard';
 import AddParticipantForm from '../Components/Dashboard/AddParticipantsForm';
 import AddFormateurAnimateur from '../Components/Dashboard/AddFormateurAnimateur';
-// import FilteredFormations from '../Components/Dashboard/FilteredFormations';
 import CdcDashboard from '../Components/Dashboard/CdcDashboard';
 import DrifDashboard from '../Components/Dashboard/DrifDashboard';
 import AddCdcForm from '../Components/Dashboard/AddCdcForm';
-// import UpdateCdcForm from '../Components/Dashboard/UpdateCdcForm';
 import AddDrifForm from '../Components/Dashboard/AddDrifForm';
-// import UpdateDrifForm from '../Components/Dashboard/UpdateDrifForm';
-import Layout from '../Components/Dashboard/layout'
+import Layout from '../Components/Dashboard/layout';
+import CoursPage from '../Components/cours/CoursPage';
+import AddCoursForm from '../Components/cours/AddCoursForm';
+import RapportsDashboard from '../Components/rapport/RapportDashboard';
+import ParticipDashboard from  '../Components/Dashboard/ParticipDashboard'
+// import Unauthorized from '../Components/Auth/Unauthorized'; // Create this component
+
+// Protected Route Wrapper
+const ProtectedRoute = ({ roles, children }) => {
+  const { user, role } = useSelector((state) => state.auth);
+  
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  
+//   if (!roles.includes(role)) {
+//     return <Navigate to="/unauthorized" replace />;
+//   }
+  
+  return children ? children : <Outlet />;
+};
 
 function Routers() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
+                {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
 
                 {/* Protected Routes with Layout */}
-                <Route path="/" element={<Layout />}>
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="formations" element={<FormationsPage />} />
-                    <Route path="ajouterformation" element={<AddFormationForm />} />
-                    <Route path="animateurs" element={<AnimateursDashboard />} />
-                    <Route path="formateurs" element={<ParticipantDashboard />} />
-                    <Route path="ajouterparticipant" element={<AddParticipantForm />} />
-                    <Route path="ajouteranimateur" element={<AddFormateurAnimateur />} />
-                    {/* <Route path="filteredformation" element={<FilteredFormations />} /> */}
-                    <Route path="cdc" element={<CdcDashboard />} />
-                    <Route path="ajoutercdc" element={<AddCdcForm />} />
-                    {/* <Route path="update-cdc/:id" element={<UpdateCdcForm />} /> */}
-                    <Route path="drif" element={<DrifDashboard />} />
-                    <Route path="add-drif" element={<AddDrifForm />} />
-                    {/* <Route path="update-drif/:id" element={<UpdateDrifForm />} /> */}
+                <Route element={<Layout />}>
+                    {/* Common routes for all authenticated users */}
+                    <Route element={<ProtectedRoute roles={['admin', 'responsable_drif', 'responsable_cdc', 'formateur_animateur', 'formateur_participant']} />}>
+                        <Route path="dashboard" element={<Dashboard />} />
+                    </Route>
+
+                    {/* Admin only routes */}
+                    <Route element={<ProtectedRoute roles={['admin']} />}>
+                        <Route path="cdc" element={<CdcDashboard />} />
+                        <Route path="ajoutercdc" element={<AddCdcForm />} />
+                        <Route path="drif" element={<DrifDashboard />} />
+                        <Route path="add-drif" element={<AddDrifForm />} />
+                    </Route>
+
+                    {/* Responsable DRIF/CDC routes */}
+                    <Route element={<ProtectedRoute roles={['responsable_drif', 'responsable_cdc']} />}>
+                        <Route path="formations" element={<FormationsPage />} />
+                        <Route path="ajouterformation" element={<AddFormationForm />} />
+                        <Route path="animateurs" element={<AnimateursDashboard />} />
+                        <Route path="formateurs" element={<ParticipantDashboard />} />
+                        <Route path="ajouterparticipant" element={<AddParticipantForm />} />
+                        <Route path="ajouteranimateur" element={<AddFormateurAnimateur />} />
+                        <Route path="rapport" element={<RapportsDashboard />} />
+                    </Route>
+
+                    {/* Formateur Animateur routes */}
+                    <Route element={<ProtectedRoute roles={['formateur_animateur']} />}>
+                        <Route path="cours" element={<CoursPage />} />
+                        <Route path="ajoutercour" element={<AddCoursForm />} />
+                    </Route>
+
+                    {/* Formateur Participant routes */}
+                    <Route element={<ProtectedRoute roles={['formateur_participant']} />}>
+                        <Route path="participantdashboard" element={<ParticipDashboard />} />
+                    </Route>
                 </Route>
             </Routes>
         </Router>
@@ -49,4 +85,3 @@ function Routers() {
 }
 
 export default Routers;
-

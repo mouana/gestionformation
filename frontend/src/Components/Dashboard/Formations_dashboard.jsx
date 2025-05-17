@@ -29,8 +29,7 @@ export default function FormationsPage() {
   }, []);
 
   const fetchFormations = () => {
-    axios
-      .get("http://127.0.0.1:8000/api/formation", {
+    axios.get("http://127.0.0.1:8000/api/formation", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

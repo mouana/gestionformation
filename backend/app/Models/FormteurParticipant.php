@@ -24,4 +24,11 @@ class FormteurParticipant extends Model
     {
         return $this->belongsTo(User::class,'utilisateur_id');
     }
+
+    public function formations()
+{
+    return $this->belongsToMany(Formation::class, 'formateur_participant_formation',
+              'formateur_participant_id', 'formation_id')
+              ->withTimestamps();
+}
 }

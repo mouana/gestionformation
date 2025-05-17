@@ -33,7 +33,11 @@ function Login() {
         }
 
         if (user) {
-            navigate("/dashboard");
+            if (user.role !== "formateur_participant") {
+                navigate("/dashboard");
+            } else {
+                navigate("/participantdashboard");
+            }
         }
     }, [user, navigate, dispatch]);
 

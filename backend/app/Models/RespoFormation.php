@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Rapport;
+
 
 class RespoFormation extends Model
 {
@@ -16,4 +18,14 @@ class RespoFormation extends Model
         'role',
         'utilisateur_id',
     ];
+
+    public function utilisateur()
+{
+    return $this->belongsTo(User::class, 'utilisateur_id');
+}
+
+public function rapports()
+{
+    return $this->hasMany(Rapport::class, 'responsable_formation_id');
+}
 }

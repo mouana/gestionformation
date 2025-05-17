@@ -10,7 +10,7 @@ export default function AddFormateurAnimateur() {
     email: "",
     motdePasse: "",
     matrecule: "",
-    role: "formateur_animateur", // fixed
+    role: "formateur_animateur", 
   });
 
   const [message, setMessage] = useState("");
@@ -37,7 +37,7 @@ export default function AddFormateurAnimateur() {
         matrecule: "",
         role: "formateur_animateur",
       });
-      navigateto('animateurs')
+      navigateto('/animateurs')
 
     } catch (error) {
       if (error.response && error.response.status === 400) {

@@ -14,94 +14,85 @@ function AddFormationForm() {
   const [dateDebut, setDateDebut] = useState('');
   const [dateFin, setDateFin] = useState('');
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate()
-  const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+  const navigate = useNavigate();
+  const today = new Date().toISOString().split("T")[0];
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [animateursRes, participantsRes] = await Promise.all([
+          axios.get('http://127.0.0.1:8000/api/formateurs-animateurs', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get('http://127.0.0.1:8000/api/participant', { // Make sure this endpoint matches your API
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        ]);
+
+        setAnimateurs(animateursRes.data);
+        
+        // Format participants for react-select
+        const participantOptions = participantsRes.data.map(p => ({
+          value: p.id,
+          label: p.utilisateur?.nom || `Participant ${p.id}` // Fallback if name not available
+        }));
+        setParticipants(participantOptions);
+      } catch (err) {
+        console.error("Error fetching data", err);
+      }
+    };
+    fetchData();
+  }, [token]);
 
   const handleDateDebutChange = (e) => {
     const value = e.target.value;
     setDateDebut(value);
 
     if (value <= today) {
-      setErrors((prev) => ({
-        ...prev,
-        dateDebut: 'La date de début doit être après la date d’aujourd’hui.',
-      }));
+      setErrors(prev => ({ ...prev, dateDebut: 'La date de début doit être après aujourd\'hui' }));
     } else {
-      setErrors((prev) => {
-        const { dateDebut, ...rest } = prev;
-        return rest;
-      });
+      const { dateDebut: _, ...rest } = errors;
+      setErrors(rest);
     }
 
-    // Also validate dateFin again in case it's before new dateDebut
-    if (dateFin && dateFin <= value) {
-      setErrors((prev) => ({
-        ...prev,
-        dateFin: 'La date de fin doit être après la date de début.',
-      }));
-    } else {
-      setErrors((prev) => {
-        const { dateFin, ...rest } = prev;
-        return rest;
-      });
+    if (dateFin && value >= dateFin) {
+      setErrors(prev => ({ ...prev, dateFin: 'La date de fin doit être après la date de début' }));
     }
   };
+
   const handleDateFinChange = (e) => {
     const value = e.target.value;
     setDateFin(value);
 
-    if (value <= dateDebut) {
-      setErrors((prev) => ({
-        ...prev,
-        dateFin: 'La date de fin doit être après la date de début.',
-      }));
+    if (dateDebut && value <= dateDebut) {
+      setErrors(prev => ({ ...prev, dateFin: 'La date de fin doit être après la date de début' }));
     } else {
-      setErrors((prev) => {
-        const { dateFin, ...rest } = prev;
-        return rest;
-      });
+      const { dateFin: _, ...rest } = errors;
+      setErrors(rest);
     }
   };
-  const token = localStorage.getItem("token"); 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [resAnimateurs, resParticipants] = await Promise.all([
-          axios.get('http://127.0.0.1:8000/api/formateurs-animateurs', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get('http://127.0.0.1:8000/api/participant', {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((res) => {
-            const options = res.data.map((p) => ({
-              value: p.id,
-              label: p.utilisateur.nom, // adjust based on API response structure
-            }));
-            setParticipants(options);
-          })
-        ]);
-        setAnimateurs(resAnimateurs.data);
-      } catch (err) {
-        console.error("Error fetching animateurs or participants", err);
-      }
-    };
-    fetchData();
-  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (Object.keys(errors).length > 0) {
+      alert('Veuillez corriger les erreurs avant de soumettre');
+      return;
+    }
+
     try {
-      await axios.post(
+      const response = await axios.post(
         'http://127.0.0.1:8000/api/add-formation',
         {
           titre,
           description,
           statut,
           animateur_id: animateurId,
-          date_validation: dateFin, 
+          participants: selectedParticipants, // This will be handled by your backend
+          date_debut: dateDebut,
+          date_fin: dateFin
         },
         {
           headers: {
@@ -111,11 +102,13 @@ function AddFormationForm() {
         }
       );
 
-      alert('Formation ajoutée avec succès !');
-      navigate('/formations')
+      if (response.status === 201) {
+        alert('Formation et participants ajoutés avec succès!');
+        navigate('/formations');
+      }
     } catch (error) {
-      console.error('Erreur lors de l’ajout de la formation', error);
-      alert("Échec de l'ajout de la formation");
+      console.error('Error adding formation:', error.response?.data || error.message);
+      alert(`Erreur: ${error.response?.data?.message || 'Échec de l\'ajout de la formation'}`);
     }
   };
 
@@ -124,6 +117,7 @@ function AddFormationForm() {
       <h1 className="text-2xl font-semibold mb-6">Ajouter formation</h1>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
+        {/* Titre Field */}
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-700">Titre</label>
           <input
@@ -136,6 +130,7 @@ function AddFormationForm() {
           />
         </div>
 
+        {/* Description Field */}
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-700">Description</label>
           <textarea
@@ -145,58 +140,53 @@ function AddFormationForm() {
             placeholder="Description"
             rows="3"
             required
-          ></textarea>
-        </div>
-
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Durée (jours)</label>
-          <input
-            type="number"
-            className="w-full px-4 py-2 border rounded-lg"
-            value={(new Date(dateFin) - new Date(dateDebut)) / (1000 * 60 * 60 * 24) || 0}
-            disabled
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <label className="block mb-2 text-sm font-medium text-gray-700">Date début</label>
-        <input
-          type="date"
-          value={dateDebut}
-          onChange={handleDateDebutChange}
-          className="w-full px-4 py-2 border rounded-lg"
-          required
-        />
-        {errors.dateDebut && <p className="text-red-500 text-sm mt-1">{errors.dateDebut}</p>}
-      </div>
-
-      <div>
-        <label className="block mb-2 text-sm font-medium text-gray-700">Date fin</label>
-        <input
-          type="date"
-          value={dateFin}
-          onChange={handleDateFinChange}
-          className="w-full px-4 py-2 border rounded-lg"
-          required
-        />
-        {errors.dateFin && <p className="text-red-500 text-sm mt-1">{errors.dateFin}</p>}
-      </div>
-    </div>
-
+        {/* Date Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">Statuts</label>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Date début</label>
+            <input
+              type="date"
+              value={dateDebut}
+              onChange={handleDateDebutChange}
+              min={today}
+              className="w-full px-4 py-2 border rounded-lg"
+              required
+            />
+            {errors.dateDebut && <p className="text-red-500 text-sm mt-1">{errors.dateDebut}</p>}
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Date fin</label>
+            <input
+              type="date"
+              value={dateFin}
+              onChange={handleDateFinChange}
+              min={dateDebut || today}
+              className="w-full px-4 py-2 border rounded-lg"
+              required
+            />
+            {errors.dateFin && <p className="text-red-500 text-sm mt-1">{errors.dateFin}</p>}
+          </div>
+        </div>
+
+        {/* Status and Animateur Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">Statut</label>
             <select
               value={statut}
               onChange={(e) => setStatut(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg"
+              required
             >
-              <option value="en attente">en attente</option>
-              <option value="en cour">en cour</option>
-              <option value="terminée">terminée</option>
-              <option value="rejetée">rejetée</option>
-              <option value="validée">validée</option>
+              <option value="en attente">En attente</option>
+              <option value="en cour">En cours</option>
+              <option value="terminée">Terminée</option>
+              <option value="rejetée">Rejetée</option>
+              <option value="validée">Validée</option>
             </select>
           </div>
 
@@ -209,40 +199,40 @@ function AddFormationForm() {
               required
             >
               <option value="">-- Sélectionner --</option>
-              {animateurs.map((anim) => (
+              {animateurs.map(anim => (
                 <option key={anim.id} value={anim.id}>
-                  {anim.utilisateur.nom}
+                  {anim.utilisateur?.nom || `Formateur ${anim.id}`}
                 </option>
               ))}
             </select>
           </div>
         </div>
 
-        
-        <div className="mb-6">
-      <label className="block mb-2 text-sm font-medium text-gray-700">
-        Formateurs participants
-      </label>
-      <Select
-        isMulti
-        options={participants}
-        value={participants.filter((p) =>
-          selectedParticipants.includes(p.value)
-        )}
-        onChange={(selectedOptions) =>
-          setSelectedParticipants(selectedOptions.map((opt) => opt.value))
-        }
-        className="basic-multi-select"
-        classNamePrefix="select"
-        placeholder="Sélectionner..."
-      />
-    </div>
+        {/* Participants Multi-Select */}
+        <div>
+          <label className="block mb-2 text-sm font-medium text-gray-700">Participants</label>
+          <Select
+            isMulti
+            options={participants}
+            value={participants.filter(p => selectedParticipants.includes(p.value))}
+            onChange={(selected) => setSelectedParticipants(selected.map(opt => opt.value))}
+            className="basic-multi-select"
+            classNamePrefix="select"
+            placeholder="Sélectionner les participants..."
+            noOptionsMessage={() => "Aucun participant disponible"}
+          />
+        </div>
 
+        {/* Action Buttons */}
         <div className="flex justify-end space-x-4 pt-4">
-          <button type="button" className="px-6 py-2 border rounded-lg hover:bg-gray-100">
-              <Link to ={'/formations'}>Annuler</Link>
-          </button>
-          <button type="submit" className="px-6 py-2 text-white bg-blue-700 hover:bg-blue-800 rounded-lg">
+          <Link to="/formations" className="px-6 py-2 border rounded-lg hover:bg-gray-100">
+            Annuler
+          </Link>
+          <button 
+            type="submit" 
+            className="px-6 py-2 text-white bg-blue-700 hover:bg-blue-800 rounded-lg"
+            disabled={Object.keys(errors).length > 0}
+          >
             Enregistrer
           </button>
         </div>
