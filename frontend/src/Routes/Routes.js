@@ -19,7 +19,9 @@ import AddCoursForm from '../Components/cours/AddCoursForm';
 import RapportsDashboard from '../Components/rapport/RapportDashboard';
 import ParticipDashboard from  '../Components/Dashboard/ParticipDashboard'
 // import Unauthorized from '../Components/Auth/Unauthorized'; // Create this component
-
+import AnimDashboard from '../Components/Dashboard/AnimDashboard'
+import CoursList from '../Components/Dashboard/coursList'
+import DrifFormation from '../Components/Dashboard/DrifFormation'
 // Protected Route Wrapper
 const ProtectedRoute = ({ roles, children }) => {
   const { user, role } = useSelector((state) => state.auth);
@@ -66,12 +68,15 @@ function Routers() {
                         <Route path="ajouterparticipant" element={<AddParticipantForm />} />
                         <Route path="ajouteranimateur" element={<AddFormateurAnimateur />} />
                         <Route path="rapport" element={<RapportsDashboard />} />
+                        <Route path="formation" element={<DrifFormation />} />
+                        <Route path="cour" element={<CoursPage />} />
                     </Route>
 
                     {/* Formateur Animateur routes */}
                     <Route element={<ProtectedRoute roles={['formateur_animateur']} />}>
-                        <Route path="cours" element={<CoursPage />} />
+                        <Route path="coursList" element={<CoursList />} />
                         <Route path="ajoutercour" element={<AddCoursForm />} />
+                        <Route path="AnimDashboard" element={<AnimDashboard />} />
                     </Route>
 
                     {/* Formateur Participant routes */}

@@ -76,7 +76,7 @@ class UtilisateurController extends Controller
             case 'formateur_animateur':
                 FormateurAnimateur::create([
 
-                    'utilisateur_id' => $utilisateurId, // 
+                    'utilisateur_id' => $utilisateurId,  
                 ]);
                 break;
         }
@@ -97,12 +97,12 @@ class UtilisateurController extends Controller
         'email' => [
             'required',
             'email',
-            Rule::unique('utilisateurs')->ignore($utilisateur->id), // ou ->ignore($utilisateur->utilisateur_id, 'utilisateur_id')
+            Rule::unique('utilisateurs')->ignore($utilisateur->id), 
         ],
         'motdePasse' => 'nullable|string|min:6',
         'matrecule' => [
             'required',
-            Rule::unique('utilisateurs')->ignore($utilisateur->id), // ou ->ignore($utilisateur->utilisateur_id, 'utilisateur_id')
+            Rule::unique('utilisateurs')->ignore($utilisateur->id), 
         ],
         'role' => 'required|in:responsable_cdc,responsable_drif,responsable_formation,formateur_animateur,formateur_participant,admin',
         'filiere' => 'nullable|string',

@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response;
-use App\Models\ResponsableDrif;
 
-class DrifAuthController extends Controller
+class CdcAthController extends Controller
 {
     public function login(Request $request)
     {
@@ -19,11 +17,11 @@ class DrifAuthController extends Controller
         if (Auth::attempt(['matrecule' => $request->matrecule, 'password' => $request->motdePasse])) {
             $user = Auth::user();
 
-            if ($user->role !== 'responsable_drif') {
+            if ($user->role !== 'responsable_cdc') {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
 
-            $token = $user->createToken('ResponsableDrifToken')->accessToken;
+            $token = $user->createToken('ACdcToken')->accessToken;
             return response()->json(['token' => $token,'user'=>$user], 200);
         }
 

@@ -20,20 +20,14 @@ class FormateurAnimateur extends Model
         return $this->belongsTo(User::class, 'utilisateur_id');
     }
 
-    // Relation avec Formation
     public function formation()
     {
-        return $this->belongsTo(Formation::class);
+        return $this->hasMany(Formation::class,'animateur_id');
     }
 
-    // Relation avec Cours
     public function cours()
     {
         return $this->hasMany(Cour::class, 'formateur_animateur_id');
     }
     
 }
-
-
-
-   

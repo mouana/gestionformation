@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { MdDashboard, MdEmail, MdCalendarToday, MdMenu, MdChevronRight, MdAdd } from 'react-icons/md';
+import { MdDashboard, MdCalendarToday, MdMenu, MdChevronRight, MdAdd } from 'react-icons/md';
+import { FiBook } from 'react-icons/fi';
 import { FaCog } from 'react-icons/fa';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import SidebarItem from './SidebarItem';
 import LogoutButton from '../../app/LogoutButton';
+import { GiNotebook  } from 'react-icons/gi';
 
 const Layout = () => {
   const location = useLocation();
@@ -40,7 +42,7 @@ const Layout = () => {
             </Link>
             <Link to="/cdc">
               <SidebarItem 
-                icon={isCollapsed ? <MdAdd /> : null}
+                icon={isCollapsed ? <MdAdd /> : <MdAdd />}
                 label="CDC" 
                 active={location.pathname === '/cdc'} 
                 isCollapsed={isCollapsed}
@@ -49,9 +51,18 @@ const Layout = () => {
             </Link>
             <Link to="/drif">
               <SidebarItem 
-                icon={isCollapsed ? <MdAdd /> : null}
+                icon={isCollapsed ? <MdAdd /> : <MdAdd />}
                 label="DRIF" 
                 active={location.pathname === '/drif'} 
+                isCollapsed={isCollapsed}
+                showPlus={isCollapsed}
+              />
+            </Link>
+            <Link to="/animateurs">
+              <SidebarItem 
+                icon={isCollapsed ? <MdAdd /> : <MdAdd />}
+                label="Animateurs" 
+                active={location.pathname === '/animateurs'} 
                 isCollapsed={isCollapsed}
                 showPlus={isCollapsed}
               />
@@ -59,6 +70,27 @@ const Layout = () => {
           </>
         );
       case 'responsable_drif':
+        return(
+          <>
+          <Link to="/dashboard">
+              <SidebarItem 
+                icon={<MdDashboard />} 
+                label="Dashboard" 
+                active={location.pathname === '/dashboard'} 
+                isCollapsed={isCollapsed}
+              />
+            </Link>
+            <Link to="/formation">
+              <SidebarItem 
+                icon={isCollapsed ? <GiNotebook /> : <GiNotebook />}
+                label="Formations" 
+                active={location.pathname === '/formation'} 
+                isCollapsed={isCollapsed}
+                showPlus={isCollapsed}
+              />
+            </Link>
+          </>
+        );
       case 'responsable_cdc':
         return (
           <>
@@ -72,20 +104,21 @@ const Layout = () => {
             </Link>
             <Link to="/formations">
               <SidebarItem 
-                icon={isCollapsed ? <MdAdd /> : null}
+                icon={isCollapsed ? <GiNotebook /> : <GiNotebook />}
                 label="Formations" 
                 active={location.pathname === '/formations'} 
                 isCollapsed={isCollapsed}
                 showPlus={isCollapsed}
               />
             </Link>
-            <Link to="/animateurs">
+            <Link to="/cour">
               <SidebarItem 
-                icon={isCollapsed ? <MdAdd /> : null}
-                label="Animateurs" 
-                active={location.pathname === '/animateurs'} 
+                icon={<FiBook />} 
+                // icon={isCollapsed ? <FiBook /> : null}
+                label="Cours" 
+                active={location.pathname === '/cour'} 
                 isCollapsed={isCollapsed}
-                showPlus={isCollapsed}
+                // showPlus={isCollapsed}
               />
             </Link>
           </>
@@ -93,27 +126,36 @@ const Layout = () => {
       case 'formateur_animateur':
         return (
           <>
-            <Link to="/dashboard">
+            <Link to="/AnimDashboard">
               <SidebarItem 
                 icon={<MdDashboard />} 
                 label="Dashboard" 
-                active={location.pathname === '/dashboard'} 
+                active={location.pathname === '/AnimDashboard'} 
                 isCollapsed={isCollapsed}
               />
             </Link>
-            <Link to="/cours">
+            <Link to="/coursList">
               <SidebarItem 
-                icon={isCollapsed ? <MdAdd /> : null}
+                icon={<FiBook />} 
+                // icon={isCollapsed ? <FiBook /> : null}
                 label="Cours" 
-                active={location.pathname === '/cours'} 
+                active={location.pathname === '/coursList'} 
                 isCollapsed={isCollapsed}
-                showPlus={isCollapsed}
+                // showPlus={isCollapsed}
               />
             </Link>
+            <Link to="/calendar">
+            <SidebarItem 
+              icon={<MdCalendarToday />} 
+              label="Calendar" 
+              active={location.pathname === '/calendar'} 
+              isCollapsed={isCollapsed}
+            />
+          </Link>
           </>
         );
       case 'formateur_participant':
-        return (
+        return (<>
           <Link to="/participantdashboard">
             <SidebarItem 
               icon={<MdDashboard />} 
@@ -122,6 +164,16 @@ const Layout = () => {
               isCollapsed={isCollapsed}
             />
           </Link>
+          <Link to="/calendar">
+            <SidebarItem 
+              icon={<MdCalendarToday />} 
+              label="Calendar" 
+              active={location.pathname === '/calendar'} 
+              isCollapsed={isCollapsed}
+            />
+          </Link>
+        </>
+          
         );
       default:
         return null;
@@ -157,22 +209,15 @@ const Layout = () => {
         <nav className="px-2 py-2 space-y-2">
           {renderSidebarItems()}
           
-          <Link to="/inbox">
+          {/* <Link to="/inbox">
             <SidebarItem 
               icon={<MdEmail />} 
               label="Inbox" 
               active={location.pathname === '/inbox'} 
               isCollapsed={isCollapsed}
             />
-          </Link>
-          <Link to="/calendar">
-            <SidebarItem 
-              icon={<MdCalendarToday />} 
-              label="Calendar" 
-              active={location.pathname === '/calendar'} 
-              isCollapsed={isCollapsed}
-            />
-          </Link>
+          </Link> */}
+          
           {getCurrentRole() !== 'formateur_participant' && (
             <Link to="/settings">
               <SidebarItem 

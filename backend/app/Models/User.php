@@ -47,4 +47,9 @@ class User extends Authenticatable
         return $this->hasMany(ResponsableDrif::class);
 
     }
+    public function formateurAnimateur(){
+
+        return $this->hasMany(FormateurAnimateur::class,'utilisateur_id');
+
+    }
 }

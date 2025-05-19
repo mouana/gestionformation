@@ -39,7 +39,6 @@ class DashboardController extends Controller
                     'course_count' => $formation->cour_count,
                     'animateur' => $formation->animateur->utilisateur->nom ?? 'N/A',
                     'status' => $formation->statut,
-
                 ];
             })
         ]);

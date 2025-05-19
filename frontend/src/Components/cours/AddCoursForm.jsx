@@ -19,26 +19,33 @@ export default function AddCoursForm() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [resFormations, resFormateurs] = await Promise.all([
-    axios.get("http://127.0.0.1:8000/api/formation", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("http://127.0.0.1:8000/api/formateurs-animateurs", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+  const fetchData = async () => {
+    try {
+      const [resFormations, resFormateurs] = await Promise.all([
+        axios.get("http://127.0.0.1:8000/api/formation", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get("http://127.0.0.1:8000/api/formateurs-animateurs", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
 
-        setFormations(resFormations.data.formations || []);
-        setFormateurs(Array.isArray(resFormateurs.data) ? resFormateurs.data : []);
-      } catch (error) {
-        console.error("Erreur lors du chargement :", error);
-      }
-    };
+      const validatedFormations = (resFormations.data.formations || [])
+        .filter(formation => formation.statut === "validée")
+        .map(formation => ({
+          id: formation.id,
+          titre: formation.titre
+        }));
 
-    fetchData();
-  }, [token]);
+      setFormations(validatedFormations);
+      setFormateurs(Array.isArray(resFormateurs.data) ? resFormateurs.data : []);
+    } catch (error) {
+      console.error("Erreur lors du chargement :", error);
+    }
+  };
+
+  fetchData();
+}, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

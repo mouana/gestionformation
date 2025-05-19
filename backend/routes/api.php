@@ -13,6 +13,7 @@ use App\Http\Controllers\ResponsableCdcController;
 use App\Http\Controllers\AdminSystemAuthController;
 
 use App\Http\Controllers\ResponsableDrifController;
+use App\Http\Controllers\AnimateurDashboardController;
 use App\Http\Controllers\FormateurAnimateurController;
 use App\Http\Controllers\FormteurParticipantController;
 
@@ -116,6 +117,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/participant/dashboard', [ParticipantController::class, 'participantDashboard']);
     Route::get('/participant/courses/{courseId}/download', [ParticipantController::class, 'downloadCourse'])
         ->name('participant.download.course');
+
+
+        Route::get('/animateurDash', [AnimateurDashboardController::class, 'animateurDashboard']);
+        Route::get('/formations', [AnimateurDashboardController::class, 'formations']);
+        Route::get('/formation/{formation}', [AnimateurDashboardController::class, 'formationDetails']);
+        Route::post('/mark-presence', [AnimateurDashboardController::class, 'markPresence']);
+        Route::get('/today-sessions', [AnimateurDashboardController::class, 'todaysSessions']);
 });
 
 // Formateur Animateur :

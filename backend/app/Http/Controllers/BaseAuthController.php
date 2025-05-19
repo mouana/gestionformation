@@ -17,8 +17,9 @@ class BaseAuthController extends Controller
             new AdminSystemAuthController(),
             new RespoFormationAuthController(),
             new FormteurParticipantAuthController(),
-
             new DrifAuthController(),
+            new CdcAthController(),
+            new AnimateurAthController(),
         ];
     }
 

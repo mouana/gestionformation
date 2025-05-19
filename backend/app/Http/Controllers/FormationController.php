@@ -72,7 +72,7 @@ class FormationController extends Controller
 
     public function index()
     {
-        $formations = Formation::with(['animateur', 'participants'])->get();
+        $formations = Formation::with(['animateur.utilisateur', 'participants'])->get();
 
         return response()->json([
             'message' => 'Formations retrieved successfully',

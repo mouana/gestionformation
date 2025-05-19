@@ -33,10 +33,13 @@ function Login() {
         }
 
         if (user) {
-            if (user.role !== "formateur_participant") {
-                navigate("/dashboard");
-            } else {
+            if (user.role === "formateur_participant") {
                 navigate("/participantdashboard");
+            } else if(user.role === 'formateur_animateur') {
+                navigate("/AnimDashboard");
+            }
+            else {
+                navigate("/dashboard");
             }
         }
     }, [user, navigate, dispatch]);
