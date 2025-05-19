@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AnimateurDashboardController extends Controller
 {
-   public function animateurDashboard()
+  public function animateurDashboard()
 {
     $user = Auth::user();
     $animateur = $user->formateurAnimateur()->first();
@@ -18,18 +18,20 @@ class AnimateurDashboardController extends Controller
         return response()->json(['error' => 'User is not an animateur'], 403);
     }
 
-    $formations = Formation::where('animateur_id', $animateur->id)->get();
+    $formations = Formation::with(['participants.utilisateur'])
+        ->where('animateur_id', $animateur->id)
+        ->get();
     
     $coursQuery = Cour::where('formateur_animateur_id', $animateur->id);
 
     $stats = [
         'total_formations' => $formations->count(),
         'total_sessions' => $coursQuery->count(),
-        'upcoming_sessions' => (clone $coursQuery)->where('dateDebut', '>=', now())->count(),
-        'completed_sessions' => (clone $coursQuery)->where('dateDebut', '<', now())->count(),
+        'upcoming_sessions' => $formations->where('statut', 'en attente')->count(),
+        'completed_sessions' => $formations->where('statut', 'terminée')->count(),
     ];
 
-    $formation = $formations->sortByDesc('created_at')->first();
+    $latestFormation = $formations->sortByDesc('created_at')->first();
 
     $sessions = $coursQuery->with(['formation:id,titre'])
         ->orderBy('dateDebut', 'desc')
@@ -53,26 +55,31 @@ class AnimateurDashboardController extends Controller
             'matricule' => $animateur->utilisateur->matrecule ?? null,
         ],
         'stats' => $stats,
-        'formation' => $formation ? [
-            'id' => $formation->id,
-            'titre' => $formation->titre,
-            'description' => $formation->description,
-            'start_date' => $formation->date_validation,
-            'status' => $formation->statut,
-            'participant_count' => $formation->participants()->count(),
-'participants' => $formation->participants()
-    ->with('utilisateur:id,nom') 
-    ->get()
-    ->map(function ($participant) {
-        return [
-            'id' => $participant->id,
-            'name' => $participant->utilisateur->nom,
-            'ISTA' => $participant->ISTA,
-            'region' => $participant->region,
-            'ville' => $participant->ville,
-        ];
-    })
-
+        'formation' => $formations->map(function ($formation) {
+            return [
+                'id' => $formation->id,
+                'titre' => $formation->titre,
+                'description' => $formation->description,
+                'start_date' => $formation->date_validation,
+                'status' => $formation->statut,
+                'participant_count' => $formation->participants->count(),
+                'participants' => $formation->participants->map(function ($participant) {
+                    return [
+                        'id' => $participant->id,
+                        'name' => $participant->utilisateur->nom ?? null,
+                        'ISTA' => $participant->ISTA ?? null,
+                        'region' => $participant->region ?? null,
+                        'ville' => $participant->ville ?? null,
+                    ];
+                })
+            ];
+        }),
+        'latest_formation' => $latestFormation ? [
+            'id' => $latestFormation->id,
+            'titre' => $latestFormation->titre,
+            'description' => $latestFormation->description,
+            'start_date' => $latestFormation->date_validation,
+            'status' => $latestFormation->statut,
         ] : null,
         'recent_sessions' => $sessions,
     ]);

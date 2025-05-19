@@ -186,4 +186,22 @@ class FormationController extends Controller
             ], 500);
         }
     }
+
+    public function show($id)
+{
+    $formation = Formation::with([
+        'animateur.utilisateur',
+        'participants.utilisateur',
+        'Cour' 
+    ])->find($id);
+
+    if (!$formation) {
+        return response()->json(['message' => 'Formation not found'], 404);
+    }
+
+    return response()->json([
+        'message' => 'Formation retrieved successfully',
+        'formation' => $formation,
+    ], 200);
+}
 }

@@ -25,7 +25,7 @@ class Formation extends Model
 
 
     public function Cour(){
-        return $this->hasMany(Cour::class);
+        return $this->hasMany(Cour::class,'formation_id');
     }
 public function participants()
 {

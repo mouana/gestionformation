@@ -25,7 +25,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/users/{id}', [UtilisateurController::class, 'update']);
     Route::delete('/users/{id}', [UtilisateurController::class, 'delete']);
     // Route::post('/admin/utilisateur', [UtilisateurController::class, 'store']);
-    Route::post('/add-formation', [FormationController::class, 'store']);
     Route::post('/add-cour', [CourController::class, 'Store']);
     Route::put('/update-cour/{id}', [CourController::class, 'update']); 
     Route::get('/cours', [CourController::class, 'index']);
@@ -45,14 +44,16 @@ Route::middleware(['auth:api'])->group(function () {
     // Route::resource('responsable-cdc', ResponsableCdcController::class);
     Route::put('/cdc/{id}', [ResponsableCdcController::class, 'update']);
     Route::get('/cdc', [ResponsableCdcController::class, 'index']);
+    Route::post('/add-formation', [FormationController::class, 'store']);
     Route::delete('/formation/{id}', [FormationController::class, 'destroy']);
     Route::post('/formation', [FormationController::class, 'store']); 
     Route::get('/formation', [FormationController::class, 'index']);
     Route::put('/formation/{id}', [FormationController::class, 'update']);
+    Route::get('/formations/{id}', [FormationController::class, 'show']);
+    // Route::post('/add-formation', [FormationController::class, 'store']);
     Route::get('/participant', [FormteurParticipantController::class, 'index']);
 Route::put('/participant/{id}', [FormteurParticipantController::class, 'update']);
     Route::post('/admin/add-utilisateur', [UtilisateurController::class, 'store']);
-    Route::post('/add-formation', [FormationController::class, 'store']);
 
     // Route::post('/add-cour', [CourController::class, 'Store']);
 
