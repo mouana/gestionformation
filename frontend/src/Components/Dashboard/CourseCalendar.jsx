@@ -4,7 +4,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { FiCalendar, FiClock, FiBook, FiAlertCircle, FiLoader, FiLink, FiUser, FiInfo } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiBook, FiAlertCircle, FiLoader } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
 const CalendrierCours = () => {
@@ -30,9 +30,14 @@ const CalendrierCours = () => {
         }
 
         const data = await response.json();
-        const coursFiltres = data?.cours?.filter(cours => 
-          cours?.formateur_animateur?.utilisateur?.id === utilisateur?.id
-        ) || [];
+
+        const coursFiltres = data?.cours?.filter(cours => {
+          const idUtilisateur = utilisateur?.id;
+          const isAnimateur = cours?.formateur_animateur?.utilisateur?.id === idUtilisateur;
+          const isParticipant = cours?.formation?.participants?.some(p => p.utilisateur_id === idUtilisateur);
+          return isAnimateur || isParticipant;
+        }) || [];
+
         setCours(coursFiltres);
       } catch (err) {
         setErreur(err.message);
@@ -46,20 +51,22 @@ const CalendrierCours = () => {
 
   const getCouleurStatut = (statut) => {
     switch (statut?.toLowerCase()) {
-      case 'en cours': return '#3b82f6';       // blue-500
-      case 'planifiée': return '#10b981';      // emerald-500
-      case 'validée': return '#8b5cf6';        // violet-500
-      case 'en attente': return '#f59e0b';     // amber-500
-      default: return '#6b7280';               // gray-500
+      case 'en cours': return '#3b82f6';      
+      case 'planifiée': return '#10b981';     
+      case 'validée': return '#8b5cf6';        
+      case 'en attente': return '#f59e0b';     
+      default: return '#6b7280';               
     }
   };
 
   const formaterCoursPourCalendrier = () => {
     return cours.map(cours => {
       const formateur = cours?.formateur_animateur?.utilisateur || {};
+      const isAnimateur = formateur.id === utilisateur?.id;
+
       return {
         id: cours.id,
-        title: cours.titre,
+        title: cours.titre + (isAnimateur ? ' (Formateur)' : ' (Participant)'),
         start: `${cours.dateDebut}T${cours.heure_debut}`,
         end: `${cours.dateFin}T${cours.heure_fin}`,
         extendedProps: {
@@ -68,7 +75,8 @@ const CalendrierCours = () => {
           nomFormateur: formateur.nom,
           emailFormateur: formateur.email,
           support: cours.support_url,
-          statut: cours.statut
+          statut: cours.statut,
+          role: isAnimateur ? 'formateur_animateur' : 'formateur_participant'
         },
         backgroundColor: getCouleurStatut(cours.statut),
         borderColor: getCouleurStatut(cours.statut),
@@ -178,7 +186,7 @@ const CalendrierCours = () => {
               Mon Emploi du temps
             </h1>
             <p className="text-gray-500 mt-1">
-              {cours.length} cours à venir
+              {cours.length} cours {cours.length > 1 ? 'à venir' : 'à venir'}
             </p>
           </div>
           <div className="mt-4 md:mt-0">

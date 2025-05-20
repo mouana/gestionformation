@@ -14,17 +14,14 @@ class CourController extends Controller
 {
     $user = auth()->user();
     
-    // Check if user is a formateur_animateur by checking the role_id or role column
-    if ($user->role === 'formateur_animateur') { // Adjust this condition based on your role system
-        // If formateur, only get their assigned courses
-        $cours = Cour::with(['formation', 'formateur_animateur.utilisateur'])
+    if ($user->role === 'formateur_animateur') { 
+        $cours = Cour::with(['formation', 'formateur_animateur.utilisateur','formation.participants'])
                     ->whereHas('formateur_animateur.utilisateur', function($query) use ($user) {
                         $query->where('id', $user->id);
                     })
                     ->get();
     } else {
-        // For all other users, get all courses
-        $cours = Cour::with(['formation', 'formateur_animateur.utilisateur'])
+        $cours = Cour::with(['formation', 'formateur_animateur.utilisateur','formation.participants'])
                     ->get();
     }
 

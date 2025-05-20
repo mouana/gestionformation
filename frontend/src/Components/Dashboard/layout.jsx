@@ -67,6 +67,15 @@ const Layout = () => {
                 showPlus={isCollapsed}
               />
             </Link>
+             <Link to="/formateurs">
+              <SidebarItem 
+                icon={isCollapsed ? <MdAdd /> : <MdAdd />}
+                label="Participants" 
+                active={location.pathname === '/formateurs'} 
+                isCollapsed={isCollapsed}
+                showPlus={isCollapsed}
+              />
+            </Link>
           </>
         );
       case 'responsable_drif':
@@ -218,7 +227,7 @@ const Layout = () => {
             />
           </Link> */}
           
-          {getCurrentRole() !== 'formateur_participant' && (
+          {/* {getCurrentRole() !== 'formateur_participant' && (
             <Link to="/settings">
               <SidebarItem 
                 icon={<FaCog />} 
@@ -227,7 +236,7 @@ const Layout = () => {
                 isCollapsed={isCollapsed}
               />
             </Link>
-          )}
+          )} */}
           <LogoutButton isCollapsed={isCollapsed} iconOnly={isCollapsed} />
         </nav>
       </aside>

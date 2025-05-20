@@ -41,7 +41,10 @@ class ParticipantController extends Controller
                     'statut' => $formation->statut,
                     'date_debut' => $formation->dateDebut,
                     'date_fin' => $formation->dateFin,
-                    'animateur' => optional($formation->animateur->utilisateur)->nom ?? 'N/A',
+                    'animateur' => [
+    'nom' => optional($formation->animateur->utilisateur)->nom ?? 'N/A',
+    'email' => optional($formation->animateur->utilisateur)->email ?? 'N/A',
+],
                     'courses' => $cours->map(function ($cour) {
                         return [
                             'id' => $cour->id,

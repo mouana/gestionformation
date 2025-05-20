@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { FileText } from 'lucide-react'; // Icône moderne
+import { FileText } from 'lucide-react'; 
 import { motion } from 'framer-motion';
 
 const token = localStorage.getItem("token");

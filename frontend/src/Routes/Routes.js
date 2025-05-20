@@ -59,6 +59,8 @@ function Routers() {
                         <Route path="ajoutercdc" element={<AddCdcForm />} />
                         <Route path="drif" element={<DrifDashboard />} />
                         <Route path="add-drif" element={<AddDrifForm />} />
+                        <Route path="formateurs" element={<ParticipantDashboard />} />
+                        <Route path="ajouterparticipant" element={<AddParticipantForm />} />
                     </Route>
 
                     {/* Responsable DRIF/CDC routes */}
@@ -66,10 +68,7 @@ function Routers() {
                         <Route path="formations" element={<FormationsPage />} />
                         <Route path="ajouterformation" element={<AddFormationForm />} />
                         <Route path="animateurs" element={<AnimateursDashboard />} />
-                        <Route path="formateurs" element={<ParticipantDashboard />} />
-                        <Route path="ajouterparticipant" element={<AddParticipantForm />} />
                         <Route path="ajouteranimateur" element={<AddFormateurAnimateur />} />
-                        <Route path="rapport" element={<RapportsDashboard />} />
                         <Route path="formation" element={<DrifFormation />} />
                         <Route path="cour" element={<CoursPage />} />
                     </Route>
@@ -81,6 +80,7 @@ function Routers() {
                         <Route path="AnimDashboard" element={<AnimDashboard />} />
                         <Route path="formations/:id" element={<PresenceList />} />
                         <Route path="calendar" element={<CourseCalendar />} />
+                        <Route path="rapport" element={<RapportsDashboard />} />
                     </Route>
 
                     {/* Formateur Participant routes */}

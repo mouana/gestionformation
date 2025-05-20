@@ -78,7 +78,9 @@ const ParticipDashboard = () => {
 
       <div className="space-y-8">
         {dashboardData.formations.length > 0 ? (
-          dashboardData.formations.map((formation) => (
+  dashboardData.formations
+    .filter((formation) => formation.statut === 'validée')
+    .map((formation) => (
             <div key={formation.id} className="bg-white rounded-lg shadow overflow-hidden">
               <div className="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600">
                 <div className="flex justify-between items-start">
@@ -96,26 +98,15 @@ const ParticipDashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="flex items-center">
                     <FaChalkboardTeacher className="text-gray-500 mr-2" />
-                    <span className="text-gray-700">Animateur: {formation.animateur}</span>
+                    <span className="text-gray-700">Animateur: {formation.animateur.nom}</span>
                   </div>
                   <div className="flex items-center">
-                    <FiCalendar className="text-gray-500 mr-2" />
-                    <span className="text-gray-700">
-                      {new Date(formation.date_debut).toLocaleDateString()} - {new Date(formation.date_fin).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className="bg-blue-600 h-2.5 rounded-full" 
-                        style={{ width: `${formation.progress}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-gray-700 ml-2">{formation.progress}%</span>
+                                        <FaChalkboardTeacher className="text-gray-500 mr-2" />
+                    <span className="text-gray-700"> Email: {formation.animateur.email}</span>
                   </div>
                 </div>
                 
-                <h3 className="text-lg font-medium text-gray-800 mb-3">Courses</h3>
+                <h3 className="text-lg font-medium text-gray-800 mb-3">Cours</h3>
                 <div className="space-y-3">
                   {formation.courses.length > 0 ? (
                     formation.courses.map((course) => (
